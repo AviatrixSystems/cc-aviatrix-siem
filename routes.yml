@@ -1,0 +1,10 @@
+routes:
+  - id: avx-syslog
+    name: "Aviatrix Syslog"
+    description: "Route Aviatrix syslog messages to parsing pipeline"
+    filter: >
+      /Aviatrix|traffic_server\[|suricata\[/.test(_raw)
+    pipeline: avx-parse
+    enabled: true
+    final: true
+    output: default

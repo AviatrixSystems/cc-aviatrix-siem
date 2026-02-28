@@ -1,0 +1,681 @@
+output: default
+groups:
+  classify:
+    name: "1. Classify & Tag"
+    description: "Detect Aviatrix log type from raw syslog and set __avx_type"
+    index: 0
+  parse_security:
+    name: "2. Parse Security Logs"
+    description: "Extract fields from microseg, L7/MITM, suricata, FQDN, and CMD logs"
+    index: 1
+  parse_networking:
+    name: "3. Parse Networking Logs"
+    description: "Extract fields from gateway stats and tunnel status logs"
+    index: 2
+  normalize:
+    name: "4. Normalize & Enrich"
+    description: "Timestamp normalization, type conversion, computed fields"
+    index: 3
+  finalize:
+    name: "5. Finalize"
+    description: "Set sourcetype, clean up internal fields"
+    index: 4
+asyncFuncTimeout: 1000
+functions:
+
+  ###########################################################################
+  # STAGE 1: CLASSIFY & TAG
+  ###########################################################################
+
+  - id: comment
+    filter: "true"
+    disabled: false
+    groupId: classify
+    conf:
+      comment: >
+        Classification stage: detect Aviatrix log type from _raw content and set
+        __avx_type internal field. All downstream functions filter on this field.
+        Log types: microseg, mitm, suricata, fqdn, cmd, gw_net_stats, gw_sys_stats, tunnel_status
+
+  - id: eval
+    filter: "true"
+    disabled: false
+    groupId: classify
+    description: "Classify Aviatrix log type from raw syslog message"
+    conf:
+      add:
+        - disabled: false
+          name: __avx_type
+          value: >
+            /AviatrixGwMicrosegPacket/.test(_raw) ? 'microseg' :
+            /traffic_server\[/.test(_raw) ? 'mitm' :
+            /suricata\[/.test(_raw) ? 'suricata' :
+            /AviatrixFQDNRule/.test(_raw) ? 'fqdn' :
+            /AviatrixCMD/.test(_raw) ? 'cmd' :
+            /AviatrixAPI/.test(_raw) ? 'cmd_v2' :
+            /AviatrixGwNetStats:/.test(_raw) ? 'gw_net_stats' :
+            /AviatrixGwSysStats:/.test(_raw) ? 'gw_sys_stats' :
+            /AviatrixTunnelStatusChange/.test(_raw) ? 'tunnel_status' :
+            'unknown'
+        - disabled: false
+          name: __avx_profile
+          value: >
+            ['microseg','mitm','suricata','fqdn','cmd','cmd_v2'].includes(__avx_type) ? 'security' :
+            ['gw_net_stats','gw_sys_stats','tunnel_status'].includes(__avx_type) ? 'networking' :
+            'unknown'
+
+  # Drop events that don't match any Aviatrix log type
+  - id: drop
+    filter: "__avx_type === 'unknown'"
+    disabled: false
+    groupId: classify
+    description: "Drop non-Aviatrix syslog messages"
+    conf: {}
+
+  ###########################################################################
+  # STAGE 2a: L4 MICROSEGMENTATION
+  ###########################################################################
+
+  # 8.2+ format with session fields
+  - id: grok
+    filter: "__avx_type === 'microseg' && /SESSION_ID=/.test(_raw)"
+    disabled: false
+    groupId: parse_security
+    description: "Parse L4 Microseg 8.2+ with session fields"
+    conf:
+      pattern: "^<%{NUMBER:syslog_pri}>%{SYSLOG_TIMESTAMP:date} +GW-%{DATA:gw_hostname}-%{IP:gw_ip}%{DATA}AviatrixGwMicrosegPacket: POLICY=%{UUID:uuid} SRC_MAC=%{MAC:src_mac} DST_MAC=%{MAC:dst_mac} IP_SZ=%{NUMBER:ip_size} SRC_IP=%{IP:src_ip} DST_IP=%{IP:dst_ip} PROTO=%{WORD:proto} SRC_PORT=%{NUMBER:src_port} DST_PORT=%{NUMBER:dst_port} DATA=%{NOTSPACE:data_hex} ACT=%{WORD:action} ENFORCED=%{WORD:enforced} SESSION_ID=%{NUMBER:session_id} SESSION_EVENT=%{NUMBER:session_event} SESSION_END_REASON=%{NUMBER:session_end_reason} SESSION_PKT_CNT=%{NUMBER:session_pkt_cnt} SESSION_BYTE_CNT=%{NUMBER:session_byte_cnt} SESSION_DUR=%{NUMBER:session_dur}"
+      srcField: _raw
+
+  # 8.2+ format without session fields (first packet of flow)
+  - id: grok
+    filter: "__avx_type === 'microseg' && !/SESSION_ID=/.test(_raw) && /POLICY=/.test(_raw)"
+    disabled: false
+    groupId: parse_security
+    description: "Parse L4 Microseg 8.2+ without session fields"
+    conf:
+      pattern: "^<%{NUMBER:syslog_pri}>%{SYSLOG_TIMESTAMP:date} +GW-%{DATA:gw_hostname}-%{IP:gw_ip}%{DATA}AviatrixGwMicrosegPacket: POLICY=%{UUID:uuid} SRC_MAC=%{MAC:src_mac} DST_MAC=%{MAC:dst_mac} IP_SZ=%{NUMBER:ip_size} SRC_IP=%{IP:src_ip} DST_IP=%{IP:dst_ip} PROTO=%{WORD:proto} SRC_PORT=%{NUMBER:src_port} DST_PORT=%{NUMBER:dst_port} DATA=%{NOTSPACE:data_hex} ACT=%{WORD:action} ENFORCED=%{WORD:enforced}"
+      srcField: _raw
+
+  # Legacy 7.x format (SPT/DPT/ACTION)
+  - id: grok
+    filter: "__avx_type === 'microseg' && /SPT=/.test(_raw)"
+    disabled: false
+    groupId: parse_security
+    description: "Parse L4 Microseg legacy 7.x format"
+    conf:
+      pattern: "^<%{NUMBER:syslog_pri}>%{SYSLOG_TIMESTAMP:date} +%{HOSTNAME:gw_hostname} +AviatrixGwMicrosegPacket: SRC_MAC=%{MAC:src_mac} DST_MAC=%{MAC:dst_mac} PROTO=%{WORD:proto} SPT=%{NUMBER:src_port} DPT=%{NUMBER:dst_port} ACTION=%{WORD:action}"
+      srcField: _raw
+
+  # Set defaults for legacy microseg missing fields
+  - id: eval
+    filter: "__avx_type === 'microseg' && src_ip === undefined"
+    disabled: false
+    groupId: parse_security
+    description: "Set defaults for legacy microseg format"
+    conf:
+      add:
+        - name: src_ip
+          value: "'unknown'"
+        - name: dst_ip
+          value: "'unknown'"
+        - name: uuid
+          value: "'legacy-format'"
+        - name: enforced
+          value: "'unknown'"
+
+  ###########################################################################
+  # STAGE 2b: L7/TLS INSPECTION (traffic_server)
+  ###########################################################################
+
+  # Extract syslog header and JSON payload
+  - id: grok
+    filter: "__avx_type === 'mitm'"
+    disabled: false
+    groupId: parse_security
+    description: "Parse L7/MITM syslog header and extract JSON payload"
+    conf:
+      pattern: "<%{NUMBER:syslog_pri}>%{SYSLOG_TIMESTAMP:date} +GW-%{DATA:gw_hostname}-%{IP}%{DATA}traffic_server\\[%{NUMBER}\\]: %{GREEDYDATA:__json_payload}"
+      srcField: _raw
+
+  # Parse the JSON payload
+  - id: code
+    filter: "__avx_type === 'mitm' && __json_payload"
+    disabled: false
+    groupId: parse_security
+    description: "Parse L7/MITM JSON payload and map to standard fields"
+    conf:
+      maxNumOfIterations: 5000
+      code: |
+        try {
+          const payload = JSON.parse(__e.__json_payload);
+
+          // Map MITM JSON fields to normalized event fields
+          __e.proto = 'TCP';
+          __e.action = payload.action || '';
+          __e.src_ip = payload.src || '';
+          __e.src_port = payload.src_port;
+          __e.dst_ip = payload.dest || '';
+          __e.dst_port = payload.dest_port;
+          __e.enforced = payload.enforced;
+          __e.uuid = payload.decided_by || '';
+          __e.mitm_sni_hostname = payload.sni_hostname || '';
+          __e.mitm_reason = payload.reason || '';
+          __e.mitm_stage = payload.stage || '';
+          __e.mitm_session_stage = payload.session_stage || '';
+          __e.mitm_session_id = payload.session_id || '';
+          __e.mitm_priority = payload.priority || '';
+          __e.ids_enabled = payload.ids;
+
+          // Session byte counts (present on session end)
+          if (payload.request_bytes !== undefined) __e.request_bytes = payload.request_bytes;
+          if (payload.response_bytes !== undefined) __e.response_bytes = payload.response_bytes;
+          if (payload.session_time !== undefined) __e.session_time_ns = payload.session_time;
+
+          // IPS/IDS fields (8.2+)
+          if (payload.sid) __e.suricata_sid = payload.sid;
+          if (payload.url) __e.mitm_url = payload.url;
+          if (payload.decrypted_by) __e.mitm_decrypted_by = payload.decrypted_by;
+          if (payload.message) __e.mitm_message = payload.message;
+
+          // Override timestamp from JSON unix epoch if available
+          if (payload.timestamp) {
+            __e._time = payload.timestamp;
+          }
+
+          // Normalize DROP → DENY
+          if (__e.action === 'DROP') __e.action = 'DENY';
+
+        } catch(e) {
+          // JSON parse failure - leave raw
+        }
+        // Clean up temp field
+        delete __e.__json_payload;
+
+  ###########################################################################
+  # STAGE 2c: SURICATA IDS/IPS
+  ###########################################################################
+
+  # Extract syslog header and JSON payload
+  - id: grok
+    filter: "__avx_type === 'suricata'"
+    disabled: false
+    groupId: parse_security
+    description: "Parse Suricata syslog header and extract JSON data"
+    conf:
+      pattern: "<%{NUMBER:syslog_pri}>%{SYSLOG_TIMESTAMP:date} +GW-%{DATA:gw_hostname}-%{IP}%{DATA}suricata\\[%{NUMBER}\\]: %{GREEDYDATA:__suricata_json}"
+      srcField: _raw
+
+  # Drop non-JSON suricata messages (startup notices, etc.)
+  - id: drop
+    filter: "__avx_type === 'suricata' && __suricata_json && !/^\\{/.test(__suricata_json)"
+    disabled: false
+    groupId: parse_security
+    description: "Drop non-JSON suricata logs (notices, startup messages)"
+    conf: {}
+
+  # Parse Suricata JSON and flatten
+  - id: code
+    filter: "__avx_type === 'suricata' && __suricata_json"
+    disabled: false
+    groupId: parse_security
+    description: "Parse and flatten Suricata JSON alert data"
+    conf:
+      maxNumOfIterations: 5000
+      code: |
+        try {
+          const data = JSON.parse(__e.__suricata_json);
+
+          // Drop stats events (too verbose, not security relevant)
+          if (data.event_type === 'stats') {
+            __e.__drop = true;
+            return;
+          }
+
+          // Top-level fields
+          __e.event_type = data.event_type || '';
+          __e.src_ip = data.src_ip || '';
+          __e.src_port = data.src_port;
+          __e.dst_ip = data.dest_ip || '';
+          __e.dst_port = data.dest_port;
+          __e.proto = data.proto || '';
+          __e.app_proto = data.app_proto || '';
+          __e.direction = data.direction || '';
+          __e.flow_id = data.flow_id;
+
+          // Flatten alert.* to top level
+          if (data.alert) {
+            __e.signature = data.alert.signature || '';
+            __e.signature_id = data.alert.signature_id;
+            __e.severity = data.alert.severity;
+            __e.category = data.alert.category || '';
+            __e.alert_action = data.alert.action || '';
+            __e.gid = data.alert.gid;
+            __e.rev = data.alert.rev;
+          }
+
+          // Flatten flow.*
+          if (data.flow) {
+            __e.flow_pkts_toserver = data.flow.pkts_toserver;
+            __e.flow_pkts_toclient = data.flow.pkts_toclient;
+            __e.flow_bytes_toserver = data.flow.bytes_toserver;
+            __e.flow_bytes_toclient = data.flow.bytes_toclient;
+            __e.flow_start = data.flow.start;
+          }
+
+          // Flatten http.*
+          if (data.http) {
+            __e.http_hostname = data.http.hostname || '';
+            __e.http_url = data.http.url || '';
+            __e.http_method = data.http.method || data.http.http_method || '';
+            __e.http_status = data.http.status;
+            __e.http_user_agent = data.http.http_user_agent || '';
+            __e.http_content_type = data.http.http_content_type || '';
+          }
+
+          // Flatten tls.* (skip certificate/chain blobs)
+          if (data.tls) {
+            __e.tls_sni = data.tls.sni || '';
+            __e.tls_subject = data.tls.subject || '';
+            __e.tls_issuer = data.tls.issuerdn || '';
+            __e.tls_ja3_hash = data.tls.ja3 ? data.tls.ja3.hash : undefined;
+            __e.tls_ja3s_hash = data.tls.ja3s ? data.tls.ja3s.hash : undefined;
+          }
+
+          // Flatten dns.*
+          if (data.dns) {
+            __e.dns_query = data.dns.query || '';
+            __e.dns_rrname = data.dns.rrname || '';
+            __e.dns_rrtype = data.dns.rrtype || '';
+            __e.dns_rdata = data.dns.rdata || '';
+          }
+
+          // Flatten metadata.* (arrays → take first value)
+          if (data.alert && data.alert.metadata) {
+            const meta = data.alert.metadata;
+            if (meta.confidence && meta.confidence[0]) __e.meta_confidence = meta.confidence[0];
+            if (meta.signature_severity && meta.signature_severity[0]) __e.meta_signature_severity = meta.signature_severity[0];
+          }
+
+          // Override timestamp from Suricata JSON
+          if (data.timestamp) {
+            try {
+              __e._time = Math.floor(new Date(data.timestamp).getTime() / 1000);
+            } catch(te) {}
+          }
+
+        } catch(e) {
+          // JSON parse failure
+        }
+        delete __e.__suricata_json;
+
+  # Drop suricata stats events flagged above
+  - id: drop
+    filter: "__avx_type === 'suricata' && __drop === true"
+    disabled: false
+    groupId: parse_security
+    description: "Drop Suricata stats events"
+    conf: {}
+
+  ###########################################################################
+  # STAGE 2d: FQDN FIREWALL
+  ###########################################################################
+
+  - id: grok
+    filter: "__avx_type === 'fqdn'"
+    disabled: false
+    groupId: parse_security
+    description: "Parse FQDN Firewall Rule logs"
+    conf:
+      pattern: "%{SYSLOG_TIMESTAMP:date}.*AviatrixFQDNRule.*Gateway=%{HOSTNAME:gateway}.*S_IP=%{IP:src_ip}.*D_IP=%{IP:dst_ip}.*hostname=%{HOSTNAME:fqdn_hostname}.*state=%{WORD:state}.*"
+      srcField: _raw
+
+  # Try to extract optional drop_reason and Rule fields
+  - id: code
+    filter: "__avx_type === 'fqdn'"
+    disabled: false
+    groupId: parse_security
+    description: "Extract optional FQDN fields (drop_reason, Rule)"
+    conf:
+      maxNumOfIterations: 5000
+      code: |
+        const raw = __e._raw || '';
+        const dropMatch = raw.match(/drop_reason=(\w+)/);
+        if (dropMatch) __e.drop_reason = dropMatch[1];
+        const ruleMatch = raw.match(/Rule=(.+?)(?:\s*$|\s+\w+=)/);
+        if (ruleMatch) __e.rule = ruleMatch[1].trim();
+
+  ###########################################################################
+  # STAGE 2e: CONTROLLER CMD/API
+  ###########################################################################
+
+  # V1 API format (AviatrixCMD) with username
+  - id: grok
+    filter: "__avx_type === 'cmd'"
+    disabled: false
+    groupId: parse_security
+    description: "Parse Controller CMD (V1 API) logs"
+    conf:
+      pattern: "%{SYSLOG_TIMESTAMP:date}.*Controller-%{IP:controller_ip}.*AviatrixCMD: action=%{WORD:action}, argv=%{DATA:args}, result=%{WORD:result}, reason=%{DATA:reason}, username=%{NOTSPACE:username}"
+      srcField: _raw
+
+  # V1 fallback without username
+  - id: grok
+    filter: "__avx_type === 'cmd' && action === undefined"
+    disabled: false
+    groupId: parse_security
+    description: "Parse Controller CMD (V1 API) without username"
+    conf:
+      pattern: "%{SYSLOG_TIMESTAMP:date}.*Controller-%{IP:controller_ip}.*AviatrixCMD: action=%{WORD:action}, argv=%{DATA:args}, result=%{WORD:result}, reason=%{DATA:reason}$"
+      srcField: _raw
+
+  # V2.5 API format (AviatrixAPI)
+  - id: grok
+    filter: "__avx_type === 'cmd_v2'"
+    disabled: false
+    groupId: parse_security
+    description: "Parse Controller API (V2.5) logs"
+    conf:
+      pattern: "%{SYSLOG_TIMESTAMP:date}.*AviatrixAPI.*url=%{GREEDYDATA:action} user=%{GREEDYDATA:username}? req_data=%{GREEDYDATA:args} resp_status=%{GREEDYDATA:result} resp_data=%{GREEDYDATA:reason}"
+      srcField: _raw
+
+  # Set gw_hostname for CMD logs
+  - id: eval
+    filter: "__avx_type === 'cmd' || __avx_type === 'cmd_v2'"
+    disabled: false
+    groupId: parse_security
+    description: "Set gw_hostname for CMD logs from controller_ip"
+    conf:
+      add:
+        - name: gw_hostname
+          value: "controller_ip ? `Controller-${controller_ip}` : 'Controller'"
+
+  ###########################################################################
+  # STAGE 3a: GATEWAY NETWORK STATS
+  ###########################################################################
+
+  - id: grok
+    filter: "__avx_type === 'gw_net_stats'"
+    disabled: false
+    groupId: parse_networking
+    description: "Parse Gateway Network Stats (AviatrixGwNetStats)"
+    conf:
+      pattern: "<%{NUMBER:syslog_pri}>%{SYSLOG_TIMESTAMP:date}%{DATA}AviatrixGwNetStats:%{DATA}name=%{NOTSPACE:gateway}(?:%{DATA}alias=%{NOTSPACE:alias})?(?:%{DATA}public_ip=%{IP:public_ip})?%{DATA}private_ip=%{IP:private_ip}%{DATA}interface=%{NOTSPACE:interface}%{DATA}total_rx_rate=%{NOTSPACE:total_rx_rate}%{DATA}total_tx_rate=%{NOTSPACE:total_tx_rate}%{DATA}total_rx_tx_rate=%{NOTSPACE:total_rx_tx_rate}%{DATA}total_rx_cum=%{NOTSPACE:total_rx_cum}%{DATA}total_tx_cum=%{NOTSPACE:total_tx_cum}%{DATA}total_rx_tx_cum=%{NOTSPACE:total_rx_tx_cum}(?:%{DATA}conntrack_limit_exceeded=%{NUMBER:conntrack_limit_exceeded})?(?:%{DATA}bw_in_limit_exceeded=%{NUMBER:bw_in_limit_exceeded})?(?:%{DATA}bw_out_limit_exceeded=%{NUMBER:bw_out_limit_exceeded})?(?:%{DATA}pps_limit_exceeded=%{NUMBER:pps_limit_exceeded})?(?:%{DATA}linklocal_limit_exceeded=%{NUMBER:linklocal_limit_exceeded})?(?:%{DATA}conntrack_count=%{NUMBER:conntrack_count})?(?:%{DATA}conntrack_allowance_available=%{NUMBER:conntrack_allowance_available})?(?:%{DATA}conntrack_usage_rate=%{NUMBER:conntrack_usage_rate})?"
+      srcField: _raw
+
+  # Parse raw rate strings to numeric bytes/sec for metrics use
+  - id: code
+    filter: "__avx_type === 'gw_net_stats'"
+    disabled: false
+    groupId: parse_networking
+    description: "Convert network rate strings (e.g. 54.07Kb) to bytes/sec"
+    conf:
+      maxNumOfIterations: 5000
+      code: |
+        function parseRate(str) {
+          if (!str || typeof str !== 'string') return 0;
+          const match = str.match(/^([\d.]+)\s*(Kb|MB|GB|KB|B)?$/i);
+          if (!match) return parseFloat(str) || 0;
+          const num = parseFloat(match[1]);
+          const unit = (match[2] || '').toUpperCase();
+          const multipliers = { 'B': 1, 'KB': 1024, 'KB': 1024, 'MB': 1048576, 'GB': 1073741824 };
+          // Kb = kilobits per second → convert to bytes
+          if (match[2] === 'Kb') return num * 1000 / 8;
+          return num * (multipliers[unit] || 1);
+        }
+        // Store raw strings for display, compute numeric values for metrics
+        __e.total_rx_rate_raw = __e.total_rx_rate;
+        __e.total_tx_rate_raw = __e.total_tx_rate;
+        __e.total_rx_tx_rate_raw = __e.total_rx_tx_rate;
+        __e.total_rx_rate_bytes = parseRate(__e.total_rx_rate);
+        __e.total_tx_rate_bytes = parseRate(__e.total_tx_rate);
+        __e.total_rx_tx_rate_bytes = parseRate(__e.total_rx_tx_rate);
+
+  ###########################################################################
+  # STAGE 3b: GATEWAY SYSTEM STATS
+  ###########################################################################
+
+  - id: grok
+    filter: "__avx_type === 'gw_sys_stats'"
+    disabled: false
+    groupId: parse_networking
+    description: "Parse Gateway System Stats (AviatrixGwSysStats)"
+    conf:
+      pattern: "<%{NUMBER:syslog_pri}>%{SYSLOG_TIMESTAMP:date}%{DATA}AviatrixGwSysStats:%{DATA}name=%{NOTSPACE:gateway}(?:%{DATA}alias=%{NOTSPACE:alias})?%{DATA}cpu_idle=%{NUMBER:cpu_idle}%{DATA}memory_free=%{NUMBER:memory_free}%{DATA}memory_available=%{NUMBER:memory_available}%{DATA}memory_total=%{NUMBER:memory_total}%{DATA}disk_total=%{NUMBER:disk_total}%{DATA}disk_free=%{NUMBER:disk_free}(?:%{DATA}cpu_cores=%{GREEDYDATA:cpu_cores_raw})?"
+      srcField: _raw
+
+  # Parse protobuf-text cpu_cores into structured data
+  - id: code
+    filter: "__avx_type === 'gw_sys_stats' && cpu_cores_raw"
+    disabled: false
+    groupId: parse_networking
+    description: "Parse cpu_cores protobuf-text into structured JSON array"
+    conf:
+      maxNumOfIterations: 5000
+      code: |
+        const raw = __e.cpu_cores_raw;
+        if (!raw || raw.length < 3) return;
+
+        // Strip outer brackets
+        let str = raw.trim();
+        if (str.startsWith('[') && str.endsWith(']')) str = str.slice(1, -1);
+
+        // Extract name:N and busy:{...} blocks
+        const cores = [];
+        const re = /(?:name:(-?\d+)\s+)?busy:\{([^}]*(?:\{[^}]*\}[^}]*)*)\}(?:\s+name:(-?\d+))?/g;
+        let match;
+        while ((match = re.exec(str)) !== null) {
+          const name = match[1] || match[3] || null;
+          const body = match[2];
+          const entry = {};
+          if (name !== null) entry.name = parseInt(name);
+
+          // Extract min/max/avg from busy block (skip start/end sub-blocks)
+          const cleaned = body.replace(/(?:start|end):\{[^}]*\}/g, '');
+          const minMatch = cleaned.match(/min:(\d+)/);
+          const maxMatch = cleaned.match(/max:(\d+)/);
+          const avgMatch = cleaned.match(/avg:(\d+)/);
+          if (minMatch) entry.busy_min = parseInt(minMatch[1]);
+          if (maxMatch) entry.busy_max = parseInt(maxMatch[1]);
+          if (avgMatch) entry.busy_avg = parseInt(avgMatch[1]);
+
+          cores.push(entry);
+        }
+
+        if (cores.length === 0) return;
+
+        __e.cpu_cores_parsed = cores;
+
+        // Find aggregate core (name=-1) for cpu_busy
+        const agg = cores.find(c => c.name === -1);
+        let individualCount = cores.filter(c => c.name !== undefined && c.name !== -1).length;
+
+        if (agg) {
+          if (agg.busy_min !== undefined) __e.cpu_aggregate_busy_min = agg.busy_min;
+          if (agg.busy_max !== undefined) __e.cpu_aggregate_busy_max = agg.busy_max;
+          if (agg.busy_avg !== undefined) __e.cpu_aggregate_busy_avg = agg.busy_avg;
+          __e.cpu_busy = agg.busy_avg !== undefined ? agg.busy_avg : agg.busy_max;
+        } else {
+          // Fallback: compute from cpu_idle
+          const idle = parseFloat(__e.cpu_idle);
+          if (!isNaN(idle)) __e.cpu_busy = Math.round((100 - idle) * 10) / 10;
+        }
+
+        if (individualCount > 0) __e.cpu_core_count = individualCount;
+
+  ###########################################################################
+  # STAGE 3c: TUNNEL STATUS
+  ###########################################################################
+
+  - id: grok
+    filter: "__avx_type === 'tunnel_status'"
+    disabled: false
+    groupId: parse_networking
+    description: "Parse Tunnel Status Change logs"
+    conf:
+      pattern: "^%{SYSLOG_TIMESTAMP:date}.*AviatrixTunnelStatusChange.*src_gw=%{NOTSPACE:src_gw}(?:%{NOTSPACE} %{NOTSPACE})?.*dst_gw=%{NOTSPACE:dst_gw}(?:%{NOTSPACE} %{NOTSPACE})?.*old_state=%{WORD:old_state}.*new_state=%{WORD:new_state}"
+      srcField: _raw
+
+  # Better tunnel gateway extraction with region info
+  - id: code
+    filter: "__avx_type === 'tunnel_status'"
+    disabled: false
+    groupId: parse_networking
+    description: "Extract gateway name, cloud, and region from tunnel status"
+    conf:
+      maxNumOfIterations: 5000
+      code: |
+        function parseTunnelGw(field) {
+          if (!field) return {};
+          // Format: "gw-name(Cloud Region)" e.g. "k8s-transit(AWS us-east-2)"
+          const match = field.match(/^([^(]+)\((\S+)\s+([^)]+)\)/);
+          if (match) return { name: match[1], cloud: match[2], region: match[3] };
+          // IP-only format: "100.20.53.124(NA NA)"
+          const ipMatch = field.match(/^([^(]+)\(NA\s+NA\)/);
+          if (ipMatch) return { name: ipMatch[1], cloud: 'unknown', region: 'unknown' };
+          return { name: field };
+        }
+        const src = parseTunnelGw(__e.src_gw);
+        const dst = parseTunnelGw(__e.dst_gw);
+        __e.src_gw_name = src.name;
+        if (src.cloud) __e.src_gw_cloud = src.cloud;
+        if (src.region) __e.src_gw_region = src.region;
+        __e.dst_gw_name = dst.name;
+        if (dst.cloud) __e.dst_gw_cloud = dst.cloud;
+        if (dst.region) __e.dst_gw_region = dst.region;
+
+  ###########################################################################
+  # STAGE 4: NORMALIZE & ENRICH
+  ###########################################################################
+
+  # Timestamp normalization: parse the date field extracted by grok
+  - id: code
+    filter: "date !== undefined && _time === undefined"
+    disabled: false
+    groupId: normalize
+    description: "Normalize syslog timestamp to epoch _time"
+    conf:
+      maxNumOfIterations: 5000
+      code: |
+        const d = __e.date;
+        if (!d) return;
+        let ts;
+        // Try ISO8601 first
+        ts = new Date(d);
+        if (isNaN(ts.getTime())) {
+          // Try "MMM dd HH:mm:ss" format — assume current year, UTC
+          const now = new Date();
+          ts = new Date(`${d} ${now.getUTCFullYear()} UTC`);
+        }
+        if (!isNaN(ts.getTime())) {
+          __e._time = Math.floor(ts.getTime() / 1000);
+        }
+        delete __e.date;
+
+  # Field type conversions
+  - id: eval
+    filter: "__avx_type === 'microseg' || __avx_type === 'mitm'"
+    disabled: false
+    groupId: normalize
+    description: "Convert microseg/MITM field types"
+    conf:
+      add:
+        - name: src_port
+          value: "Number(src_port) || 0"
+        - name: dst_port
+          value: "Number(dst_port) || 0"
+        - name: enforced
+          value: "String(enforced) === 'true'"
+
+  - id: eval
+    filter: "__avx_type === 'gw_sys_stats'"
+    disabled: false
+    groupId: normalize
+    description: "Convert system stats field types"
+    conf:
+      add:
+        - name: cpu_idle
+          value: "Number(cpu_idle)"
+        - name: memory_free
+          value: "Number(memory_free)"
+        - name: memory_available
+          value: "Number(memory_available)"
+        - name: memory_total
+          value: "Number(memory_total)"
+        - name: disk_total
+          value: "Number(disk_total)"
+        - name: disk_free
+          value: "Number(disk_free)"
+
+  - id: eval
+    filter: "__avx_type === 'gw_net_stats'"
+    disabled: false
+    groupId: normalize
+    description: "Convert network stats field types"
+    conf:
+      add:
+        - name: conntrack_limit_exceeded
+          value: "Number(conntrack_limit_exceeded) || 0"
+        - name: bw_in_limit_exceeded
+          value: "Number(bw_in_limit_exceeded) || 0"
+        - name: bw_out_limit_exceeded
+          value: "Number(bw_out_limit_exceeded) || 0"
+        - name: pps_limit_exceeded
+          value: "Number(pps_limit_exceeded) || 0"
+        - name: conntrack_count
+          value: "Number(conntrack_count) || 0"
+
+  ###########################################################################
+  # STAGE 5: FINALIZE
+  ###########################################################################
+
+  # Set avx_sourcetype for downstream routing and SIEM indexing
+  - id: eval
+    filter: "true"
+    disabled: false
+    groupId: finalize
+    description: "Set sourcetype, source, host, and log_profile for SIEM routing"
+    conf:
+      add:
+        - name: avx_sourcetype
+          value: >
+            __avx_type === 'microseg' ? 'aviatrix:firewall:l4' :
+            __avx_type === 'mitm' ? 'aviatrix:firewall:l7' :
+            __avx_type === 'suricata' ? 'aviatrix:ids' :
+            __avx_type === 'fqdn' ? 'aviatrix:firewall:fqdn' :
+            (__avx_type === 'cmd' || __avx_type === 'cmd_v2') ? 'aviatrix:controller:audit' :
+            __avx_type === 'gw_net_stats' ? 'aviatrix:gateway:network' :
+            __avx_type === 'gw_sys_stats' ? 'aviatrix:gateway:system' :
+            __avx_type === 'tunnel_status' ? 'aviatrix:tunnel:status' :
+            'aviatrix:unknown'
+        - name: avx_source
+          value: >
+            __avx_type === 'microseg' ? 'avx-l4-fw' :
+            __avx_type === 'mitm' ? 'avx-l7-fw' :
+            __avx_type === 'suricata' ? 'avx-ids' :
+            __avx_type === 'fqdn' ? 'avx-fqdn' :
+            (__avx_type === 'cmd' || __avx_type === 'cmd_v2') ? 'avx-cmd' :
+            __avx_type === 'gw_net_stats' ? 'avx-gw-net-stats' :
+            __avx_type === 'gw_sys_stats' ? 'avx-gw-sys-stats' :
+            __avx_type === 'tunnel_status' ? 'avx-tunnel-status' :
+            'avx-unknown'
+        - name: avx_host
+          value: "gw_hostname || gateway || 'aviatrix'"
+        - name: avx_log_type
+          value: >
+            __avx_type === 'cmd_v2' ? 'cmd' : __avx_type
+        - name: avx_log_profile
+          value: "__avx_profile"
+
+  # Clean up internal working fields
+  - id: eval
+    filter: "true"
+    disabled: false
+    groupId: finalize
+    description: "Remove internal fields, keep syslog_pri for auditing"
+    conf:
+      remove:
+        - __avx_type
+        - __avx_profile
+        - __drop
+        - __json_payload
+        - __suricata_json
