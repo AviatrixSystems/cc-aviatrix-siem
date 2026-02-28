@@ -223,13 +223,53 @@ When routing to Splunk HEC, map these fields in your Cribl Destination:
 | `avx_source` | `source` |
 | `avx_host` | `host` |
 
+### FQDN Firewall
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `gateway` | string | Gateway name |
+| `src_ip` / `dst_ip` | string | Source/destination IPs |
+| `fqdn_hostname` | string | Resolved FQDN (e.g., `*.amazonaws.com`) |
+| `state` | string | MATCHED or DROPPED |
+| `rule` | string | Matching firewall rule (e.g., `*.amazonaws.com;1`) |
+| `drop_reason` | string | Reason for drop (when state=DROPPED) |
+
+### Controller API Audit
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `controller_ip` | string | Controller IP address |
+| `action` | string | API action (e.g., `USER_LOGIN_MANAGEMENT`) |
+| `args` | string | Command arguments |
+| `result` | string | Success or failure |
+| `reason` | string | Failure reason (if applicable) |
+| `username` | string | User who initiated the action |
+
+## Screenshots
+
+### Pipeline Stages
+All 5 processing stages with 31 functions:
+
+![Pipeline Stages](docs/screenshots/pipeline-stages.png)
+
+### Routes
+Aviatrix Syslog route + Catch-All devnull:
+
+![Pack Routes](docs/screenshots/pack-routes.png)
+
+### Preview — Microseg Event
+Fully parsed L4 microsegmentation event with field extraction:
+
+![Preview Microseg](docs/screenshots/pipeline-preview-microseg.png)
+
 ## Testing
 
-The Pack includes sample data in `samples/aviatrix-syslog.log` covering all 8 log types. Use Cribl's Preview feature:
+The Pack includes 47 sample events in `aviatrix-syslog.log` covering all 8 log types. Use Cribl's Preview feature:
 
 1. Open the `avx-parse` pipeline
 2. In the Preview pane, select the `aviatrix-syslog.log` sample
-3. Step through each function group to verify parsing
+3. Click **Run** to process all events
+4. Verify all 8 log types parse with correct `avx_sourcetype` values
 
 ## Compatibility
 
@@ -253,6 +293,24 @@ The Pack produces the same field names and sourcetypes as the Logstash connector
 ## Contributing
 
 See the [aviatrix-siem-connector CONTRIBUTING.md](https://github.com/AviatrixSystems/aviatrix-siem-connector/blob/main/CONTRIBUTING.md) for log format documentation and test methodology.
+
+## Support
+
+For issues with this Pack, contact:
+- **Email:** support@aviatrix.com
+- **GitHub Issues:** [aviatrix-cribl-pack](https://github.com/AviatrixSystems/aviatrix-cribl-pack/issues)
+
+For Aviatrix product issues, visit the [Aviatrix Support Portal](https://support.aviatrix.com).
+
+## Release Notes
+
+### v0.1.0 (2026-02-28)
+- Initial release
+- 8 log types: L4 Microseg, L7/TLS, Suricata IDS, FQDN, CMD Audit, Gateway Net Stats, Gateway Sys Stats, Tunnel Status
+- Single pipeline (`avx-parse`) with 5 processing stages
+- Backward-compatible Splunk sourcetype mapping
+- 47 sample events covering all log types
+- Legacy 7.x and 8.2+ session format support
 
 ## License
 

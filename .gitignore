@@ -5,9 +5,33 @@ dist/
 # macOS
 .DS_Store
 
-# IDE
+# IDE / Editor
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Previous exploration (reference only, not part of pack)
-# Keeping tracked for now as historical reference
+# Local development tools
+.claude/
+.playwright-mcp/
+
+# Internal development docs (not customer-facing)
+docs/plans/
+docs/STRATEGY.md
+docs/SYNC_STRATEGY.md
+docs/DISPENSARY_REQUIREMENTS.md
+docs/LOGSTASH_MAPPING.md
+
+# Internal dev guide
+CLAUDE.md
+
+# Prototype / exploration files
+previous-exploration/
+
+# Root-level duplicates (authoritative copies live in default/)
+/pack.yml
+/routes.yml
+/pipelines/
+/knowledge/
+/samples/

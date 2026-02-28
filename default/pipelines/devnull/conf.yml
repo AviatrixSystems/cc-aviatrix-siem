@@ -1,0 +1,10 @@
+output: default
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: drop
+    filter: "true"
+    disabled: false
+    conf: {}
+    final: true
+    description: "Drop all events (catch-all blackhole)"
