@@ -586,6 +586,23 @@ functions:
         - name: enforced
           value: "String(enforced) === 'true'"
 
+  # Enrich session fields with human-readable text (8.2+ events only)
+  # Uses PAN-OS naming conventions for session_event and session_end_reason
+  - id: eval
+    filter: "__avx_type === 'microseg' && session_event !== undefined"
+    disabled: false
+    groupId: normalize
+    description: "Map session_event and session_end_reason integers to text"
+    conf:
+      add:
+        - name: session_event_type
+          value: "Number(session_event) === 0 ? 'Start' : 'End'"
+        - name: session_end_reason_text
+          value: >
+            session_end_reason !== undefined ?
+            ({0:'active', 1:'tcp-fin', 2:'tcp-rst', 3:'timeout', 4:'tcp-rst-from-client', 5:'tcp-rst-from-server'})[Number(session_end_reason)] || 'unknown'
+            : undefined
+
   - id: eval
     filter: "__avx_type === 'gw_sys_stats'"
     disabled: false
