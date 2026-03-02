@@ -1,0 +1,614 @@
+- generic [ref=e13]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - link "Stream Home" [ref=e17] [cursor=pointer]:
+          - /url: /stream
+          - generic "Stream" [ref=e18]:
+            - img [ref=e19]
+            - img [ref=e25]
+        - separator [ref=e32]
+        - button "Show all available Products" [ref=e33] [cursor=pointer]:
+          - img "Show all available" [ref=e34]
+          - generic [ref=e36]: Products
+      - generic [ref=e37]:
+        - button "Aviatrix-Pro ductTeam" [ref=e38] [cursor=pointer]:
+          - img [ref=e39]
+          - generic "Aviatrix-ProductTeam" [ref=e42]:
+            - generic [ref=e43]: Aviatrix-Pro
+            - generic [ref=e44]: ductTeam
+        - separator [ref=e45]
+        - button "mai n" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+          - generic "main" [ref=e52]:
+            - generic [ref=e53]: mai
+            - generic [ref=e54]: "n"
+    - generic [ref=e55]:
+      - generic [ref=e295]:
+        - img "search" [ref=e296]:
+          - img [ref=e297]
+        - generic [ref=e300]:
+          - combobox [ref=e302]
+          - generic: Search Stream...
+      - generic [ref=e56]:
+        - button "bell" [ref=e58] [cursor=pointer]:
+          - img "bell" [ref=e59]:
+            - img [ref=e60]
+        - button "branches 99+" [ref=e62] [cursor=pointer]:
+          - generic [ref=e63]:
+            - img "branches" [ref=e64]:
+              - img [ref=e65]
+            - superscript [ref=e67]: 99+
+        - button "Account" [ref=e68] [cursor=pointer]:
+          - generic [ref=e70]: CM
+  - generic [ref=e71]:
+    - complementary [ref=e72]:
+      - generic [ref=e74]:
+        - list [ref=e75]:
+          - listitem [ref=e76] [cursor=pointer]:
+            - button "Collapse sidebar Collapse" [ref=e77]:
+              - img "Collapse sidebar" [ref=e79]
+              - generic [ref=e81]: Collapse
+          - link "Stream Home" [ref=e82] [cursor=pointer]:
+            - /url: /stream
+            - listitem [ref=e83]:
+              - generic [ref=e84]:
+                - img [ref=e86]
+                - generic [ref=e88]: Stream Home
+          - link "Worker Groups" [ref=e89] [cursor=pointer]:
+            - /url: /stream/m
+            - listitem [ref=e90]:
+              - generic [ref=e91]:
+                - img [ref=e93]
+                - generic [ref=e95]: Worker Groups
+          - link "Workers" [ref=e96] [cursor=pointer]:
+            - /url: /stream/workers
+            - listitem [ref=e97]:
+              - generic [ref=e98]:
+                - img [ref=e100]
+                - generic [ref=e102]: Workers
+          - link "Outposts" [ref=e103] [cursor=pointer]:
+            - /url: /stream/outposts
+            - listitem [ref=e104]:
+              - generic [ref=e105]:
+                - img [ref=e107]
+                - generic [ref=e109]: Outposts
+          - link "Monitoring" [ref=e110] [cursor=pointer]:
+            - /url: /stream/dashboard
+            - listitem [ref=e111]:
+              - generic [ref=e112]:
+                - img [ref=e114]
+                - generic [ref=e116]: Monitoring
+          - link "Notifications" [ref=e117] [cursor=pointer]:
+            - /url: /stream/notifications
+            - listitem [ref=e118]:
+              - generic [ref=e119]:
+                - img [ref=e121]
+                - generic [ref=e123]: Notifications
+        - list [ref=e125]:
+          - link "Settings" [ref=e126] [cursor=pointer]:
+            - /url: /global-settings
+            - listitem [ref=e127]:
+              - generic [ref=e128]:
+                - img [ref=e130]
+                - generic [ref=e132]: Settings
+          - listitem [ref=e133] [cursor=pointer]:
+            - button "Organization Details" [ref=e134]:
+              - img [ref=e136]
+              - generic [ref=e139]: Organization Details
+    - generic [ref=e140]:
+      - generic [ref=e303]:
+        - navigation [ref=e305]:
+          - list [ref=e306]:
+            - listitem [ref=e307]:
+              - link "Worker Groups" [ref=e309] [cursor=pointer]:
+                - /url: /stream/m
+            - generic [ref=e310]: /
+            - listitem [ref=e311]:
+              - link "default" [ref=e313] [cursor=pointer]:
+                - /url: /stream/m/default
+            - generic [ref=e621]: /
+            - listitem [ref=e622]: Processing
+            - generic: •
+            - listitem [ref=e623]:
+              - link "Packs" [ref=e830] [cursor=pointer]:
+                - /url: /stream/m/default/p
+            - generic [ref=e831]: /
+            - listitem [ref=e832]:
+              - generic [ref=e833] [cursor=pointer]:
+                - generic [ref=e835]: cc-aviatrix-siem
+                - img "down" [ref=e836]:
+                  - img [ref=e837]
+        - link "Workers warning warning count" [ref=e345] [cursor=pointer]:
+          - /url: /stream/workers?qm=form&connected=true&group=default
+          - button "Workers warning warning count" [ref=e346]:
+            - generic [ref=e347]: Workers
+            - img "warning" [ref=e349]:
+              - img [ref=e350]
+            - generic "warning count" [ref=e352]: "1"
+        - generic [ref=e353]:
+          - button "fb5fd14 down" [ref=e354] [cursor=pointer]:
+            - img [ref=e355]
+            - generic [ref=e357]: fb5fd14
+            - img "down" [ref=e358]:
+              - img [ref=e359]
+          - generic [ref=e361]:
+            - generic [ref=e362]:
+              - button "Commit" [ref=e363] [cursor=pointer]:
+                - generic [ref=e364]: Commit
+              - superscript [ref=e365]:
+                - generic [ref=e760]: "1"
+                - generic [ref=e366]: "4"
+            - generic [ref=e367]:
+              - button "Deploy" [ref=e368] [cursor=pointer]:
+                - generic [ref=e369]: Deploy
+              - superscript [ref=e370]:
+                - generic [ref=e371]: "1"
+      - main [ref=e141]:
+        - generic [ref=e839]:
+          - heading "Pipelines Attached to 0 resources" [level=5] [ref=e1112]:
+            - generic [ref=e844]:
+              - generic [ref=e846]:
+                - tablist [ref=e847]:
+                  - generic [ref=e849]:
+                    - tab "Routes" [ref=e851] [cursor=pointer]:
+                      - link "Routes" [ref=e852]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/routes
+                    - tab "Pipelines" [selected] [ref=e854] [cursor=pointer]:
+                      - link "Pipelines" [ref=e855]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/pipelines
+                    - tab "Sources" [ref=e857] [cursor=pointer]:
+                      - link "Sources" [ref=e858]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/inputs
+                    - tab "Destinations" [ref=e860] [cursor=pointer]:
+                      - link "Destinations" [ref=e861]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/outputs
+                    - tab "Knowledge" [ref=e863] [cursor=pointer]:
+                      - link "Knowledge" [ref=e864]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/knowledge
+                    - tab "Pack Settings" [ref=e866] [cursor=pointer]:
+                      - link "Pack Settings" [ref=e867]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/pack-settings
+                - generic:
+                  - generic:
+                    - tabpanel "Pipelines"
+              - generic [ref=e868] [cursor=pointer]:
+                - text: Attached to
+                - generic [ref=e869]: 0 resources
+          - generic [ref=e871]:
+            - generic [ref=e872]:
+              - generic "Pipeline Config" [ref=e1113]:
+                - generic [ref=e1114]:
+                  - generic [ref=e1116]:
+                    - generic [ref=e1118]:
+                      - generic: avx-parse
+                      - generic [ref=e1119] [cursor=pointer]: Show Stats
+                      - generic [ref=e1120] [cursor=pointer]: Attached to 1 Route
+                    - generic [ref=e1121]:
+                      - button "Add Function down" [ref=e1122] [cursor=pointer]:
+                        - generic [ref=e1123]: Add Function
+                        - img "down" [ref=e1124]:
+                          - img [ref=e1125]
+                      - button "Add Comment" [ref=e1127] [cursor=pointer]:
+                        - img "Add Comment" [ref=e1128]
+                      - link "Manage as JSON" [ref=e1130] [cursor=pointer]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/pipelines/avx-parse/advanced
+                        - img "Manage as JSON" [ref=e1131]
+                      - link "setting" [ref=e1133] [cursor=pointer]:
+                        - /url: /stream/m/default/p/cc-aviatrix-siem/pipelines/avx-parse/config
+                        - img "setting" [ref=e1134]:
+                          - img [ref=e1135]
+                  - table [ref=e1139]:
+                    - generic [ref=e1140]:
+                      - button [ref=e1141] [cursor=pointer]:
+                        - img [ref=e1142]
+                      - generic [ref=e1144] [cursor=pointer]:
+                        - img [ref=e1145]
+                        - generic "+ 3 ..." [ref=e1151]:
+                          - generic: + 3 ...
+                      - columnheader "All caret-down" [ref=e1152]:
+                        - generic [ref=e1154] [cursor=pointer]:
+                          - text: All
+                          - img "caret-down" [ref=e1155]:
+                            - img [ref=e1156]
+                      - columnheader "Function" [ref=e1159]
+                      - columnheader "Filter" [ref=e1161]
+                    - generic [ref=e1162]:
+                      - row "Expand row (1-3) 1. Classify & Tag Item settings" [ref=e1163]:
+                        - button "Expand row" [ref=e1165] [cursor=pointer]:
+                          - img "double-right" [ref=e1167]:
+                            - img [ref=e1168]
+                        - generic [ref=e1172]:
+                          - img [ref=e1174]
+                          - generic [ref=e1177]:
+                            - cell [ref=e1178]:
+                              - switch [checked] [ref=e1180] [cursor=pointer]
+                            - cell "(1-3) 1. Classify & Tag" [ref=e1182]:
+                              - generic [ref=e1183] [cursor=pointer]: (1-3) 1. Classify & Tag
+                            - cell [ref=e1184]
+                          - button "Item settings" [ref=e1187] [cursor=pointer]:
+                            - img "ellipsis" [ref=e1188]:
+                              - img [ref=e1189]
+                      - row "Expand row (4-19) 2. Parse Security Logs Item settings" [ref=e1191]:
+                        - button "Expand row" [ref=e1193] [cursor=pointer]:
+                          - img "double-right" [ref=e1195]:
+                            - img [ref=e1196]
+                        - generic [ref=e1200]:
+                          - img [ref=e1202]
+                          - generic [ref=e1205]:
+                            - cell [ref=e1206]:
+                              - switch [checked] [ref=e1208] [cursor=pointer]
+                            - cell "(4-19) 2. Parse Security Logs" [ref=e1210]:
+                              - generic [ref=e1211] [cursor=pointer]: (4-19) 2. Parse Security Logs
+                            - cell [ref=e1212]
+                          - button "Item settings" [ref=e1215] [cursor=pointer]:
+                            - img "ellipsis" [ref=e1216]:
+                              - img [ref=e1217]
+                      - row "Expand row (20-25) 3. Parse Networking Logs Item settings" [ref=e1219]:
+                        - button "Expand row" [ref=e1221] [cursor=pointer]:
+                          - img "double-right" [ref=e1223]:
+                            - img [ref=e1224]
+                        - generic [ref=e1228]:
+                          - img [ref=e1230]
+                          - generic [ref=e1233]:
+                            - cell [ref=e1234]:
+                              - switch [checked] [ref=e1236] [cursor=pointer]
+                            - cell "(20-25) 3. Parse Networking Logs" [ref=e1238]:
+                              - generic [ref=e1239] [cursor=pointer]: (20-25) 3. Parse Networking Logs
+                            - cell [ref=e1240]
+                          - button "Item settings" [ref=e1243] [cursor=pointer]:
+                            - img "ellipsis" [ref=e1244]:
+                              - img [ref=e1245]
+                      - row "Expand row (26-29) 4. Normalize & Enrich Item settings" [ref=e1247]:
+                        - button "Expand row" [ref=e1249] [cursor=pointer]:
+                          - img "double-right" [ref=e1251]:
+                            - img [ref=e1252]
+                        - generic [ref=e1256]:
+                          - img [ref=e1258]
+                          - generic [ref=e1261]:
+                            - cell [ref=e1262]:
+                              - switch [checked] [ref=e1264] [cursor=pointer]
+                            - cell "(26-29) 4. Normalize & Enrich" [ref=e1266]:
+                              - generic [ref=e1267] [cursor=pointer]: (26-29) 4. Normalize & Enrich
+                            - cell [ref=e1268]
+                          - button "Item settings" [ref=e1271] [cursor=pointer]:
+                            - img "ellipsis" [ref=e1272]:
+                              - img [ref=e1273]
+                      - row "Expand row (30-31) 5. Finalize Item settings" [ref=e1275]:
+                        - button "Expand row" [ref=e1277] [cursor=pointer]:
+                          - img "double-right" [ref=e1279]:
+                            - img [ref=e1280]
+                        - generic [ref=e1283]:
+                          - img [ref=e1285]
+                          - generic [ref=e1288]:
+                            - cell [ref=e1289]:
+                              - switch [checked] [ref=e1291] [cursor=pointer]
+                            - cell "(30-31) 5. Finalize" [ref=e1293]:
+                              - generic [ref=e1294] [cursor=pointer]: (30-31) 5. Finalize
+                            - cell [ref=e1295]
+                          - button "Item settings" [ref=e1298] [cursor=pointer]:
+                            - img "ellipsis" [ref=e1299]:
+                              - img [ref=e1300]
+              - generic "Data preview pane" [ref=e1302]:
+                - menu [ref=e1303]:
+                  - menuitem "Sample Data" [ref=e1304] [cursor=pointer]:
+                    - generic [ref=e1306]: Sample Data
+                  - menuitem "Simple Preview question-circle" [ref=e1307] [cursor=pointer]:
+                    - generic [ref=e1309]:
+                      - text: Simple Preview
+                      - img "question-circle" [ref=e1310]:
+                        - img [ref=e1311]
+                  - menuitem [disabled]:
+                    - img:
+                      - img
+                - generic [ref=e1315]:
+                  - generic [ref=e1415]:
+                    - img "right" [ref=e1417] [cursor=pointer]:
+                      - img [ref=e1418]
+                    - generic [ref=e1422] [cursor=pointer]:
+                      - generic [ref=e1423]:
+                        - combobox [ref=e1425]
+                        - generic "aviatrix-syslog.log" [ref=e1426]
+                      - generic:
+                        - img:
+                          - img
+                    - img "arrow-right" [ref=e1427]:
+                      - img [ref=e1428]
+                    - generic [ref=e1433] [cursor=pointer]:
+                      - generic [ref=e1434]:
+                        - combobox [disabled] [ref=e1436]
+                        - generic "avx-parse" [ref=e1437]
+                      - generic:
+                        - img:
+                          - img
+                    - generic [ref=e1438]:
+                      - button "caret-right Run" [ref=e1439] [cursor=pointer]:
+                        - img "caret-right" [ref=e1960]:
+                          - img [ref=e1961]
+                        - generic [ref=e1443]: Run
+                      - button "ellipsis" [ref=e1444] [cursor=pointer]:
+                        - img "ellipsis" [ref=e1445]:
+                          - img [ref=e1446]
+                  - generic "Events container" [ref=e1448]:
+                    - generic [ref=e1673]:
+                      - generic [ref=e1674]:
+                        - generic [ref=e1675]:
+                          - generic [ref=e1676] [cursor=pointer]:
+                            - generic [ref=e1677]:
+                              - radio "Sample data in tab"
+                            - text: IN
+                          - generic [ref=e1678] [cursor=pointer]:
+                            - generic [ref=e1679]:
+                              - radio "Sample data out tab" [checked]
+                            - text: OUT
+                        - generic "Event display options" [ref=e1680]:
+                          - img "filter" [ref=e1682] [cursor=pointer]:
+                            - img [ref=e1683]
+                          - generic "Event visualization options" [ref=e1685]:
+                            - generic [ref=e1686] [cursor=pointer]:
+                              - generic [ref=e1687]:
+                                - radio "Switch to JSON view" [checked]
+                              - img [ref=e1689]:
+                                - img [ref=e1690]
+                            - generic [ref=e1694] [cursor=pointer]:
+                              - generic [ref=e1695]:
+                                - radio "Switch to table view"
+                              - img [ref=e1697]:
+                                - img [ref=e1698]
+                            - generic [ref=e1701]:
+                              - generic [ref=e1702]:
+                                - radio "Switch to metrics view" [disabled]
+                              - img [ref=e1704]:
+                                - img [ref=e1705]
+                          - img "bar-chart" [ref=e1707] [cursor=pointer]:
+                            - img [ref=e1708]
+                        - generic [ref=e1711]:
+                          - generic [ref=e1712] [cursor=pointer]:
+                            - generic:
+                              - img:
+                                - img
+                          - generic: Select Fields (96 of 96)
+                        - img "setting" [ref=e1714] [cursor=pointer]:
+                          - img [ref=e1715]
+                      - generic "Event table" [ref=e1717]:
+                        - generic [ref=e1718]:
+                          - treegrid [ref=e1720]:
+                            - rowgroup [ref=e1721] [cursor=pointer]:
+                              - row "# Event" [ref=e1722]:
+                                - columnheader "#" [ref=e1723]:
+                                  - text: 
+                                  - generic [ref=e1727]: "#"
+                                - columnheader "Event" [ref=e1729]:
+                                  - text: 
+                                  - generic [ref=e1733]: Event
+                            - rowgroup [ref=e1735]:
+                              - 'row "1 2026-02-24 19:17:31.000 -05:00 α _raw: <14>Feb 25 00:17:31 avx-gw-test AviatrixGwMicrosegPacket: SRC_MAC=aa:bb:cc:dd:ee:ff DST_MAC=11:22:33:44:55:66 PROTO=TCP SPT=443 DPT=8080 ACTION=PERMIT # _time: 1771978651 α action: PERMIT α avx_host: avx-gw-test α avx_log_profile: security α avx_log_type: microseg α avx_source: avx-l4-fw α avx_sourcetype: aviatrix:firewall:l4 α cribl_breaker: Break on newlines α cribl_pipe: avx-parse α dst_ip: unknown α dst_mac: 11:22:33:44:55:66 # dst_port: 8080 b enforced: false α gw_hostname: avx-gw-test α proto: TCP α src_ip: unknown α src_mac: aa:bb:cc:dd:ee:ff # src_port: 443 α syslog_pri: 14 α uuid: legacy-format" [ref=e1963]':
+                                - gridcell "1 2026-02-24 19:17:31.000 -05:00" [ref=e1964]:
+                                  - generic [ref=e1965]:
+                                    - generic [ref=e1966]: "1"
+                                    - generic [ref=e1967]: 2026-02-24 19:17:31.000 -05:00
+                                - 'gridcell "α _raw: <14>Feb 25 00:17:31 avx-gw-test AviatrixGwMicrosegPacket: SRC_MAC=aa:bb:cc:dd:ee:ff DST_MAC=11:22:33:44:55:66 PROTO=TCP SPT=443 DPT=8080 ACTION=PERMIT # _time: 1771978651 α action: PERMIT α avx_host: avx-gw-test α avx_log_profile: security α avx_log_type: microseg α avx_source: avx-l4-fw α avx_sourcetype: aviatrix:firewall:l4 α cribl_breaker: Break on newlines α cribl_pipe: avx-parse α dst_ip: unknown α dst_mac: 11:22:33:44:55:66 # dst_port: 8080 b enforced: false α gw_hostname: avx-gw-test α proto: TCP α src_ip: unknown α src_mac: aa:bb:cc:dd:ee:ff # src_port: 443 α syslog_pri: 14 α uuid: legacy-format" [ref=e1968]':
+                                  - generic [ref=e1971]:
+                                    - generic [ref=e1972]:
+                                      - generic [ref=e1973]: α
+                                      - generic [ref=e1974]: "_raw:"
+                                      - generic [ref=e1975]: "<14>Feb 25 00:17:31 avx-gw-test AviatrixGwMicrosegPacket: SRC_MAC=aa:bb:cc:dd:ee:ff DST_MAC=11:22:33:44:55:66 PROTO=TCP SPT=443 DPT=8080 ACTION=PERMIT"
+                                    - generic [ref=e1976]:
+                                      - generic [ref=e1977]: "#"
+                                      - generic [ref=e1978]: "_time:"
+                                      - generic [ref=e1979]: "1771978651"
+                                    - generic [ref=e1980]:
+                                      - generic [ref=e1981]: α
+                                      - generic [ref=e1982]: "action:"
+                                      - generic [ref=e1983]: PERMIT
+                                    - generic [ref=e1984]:
+                                      - generic [ref=e1985]: α
+                                      - generic [ref=e1986]: "avx_host:"
+                                      - generic [ref=e1987]: avx-gw-test
+                                    - generic [ref=e1988]:
+                                      - generic [ref=e1989]: α
+                                      - generic [ref=e1990]: "avx_log_profile:"
+                                      - generic [ref=e1991]: security
+                                    - generic [ref=e1992]:
+                                      - generic [ref=e1993]: α
+                                      - generic [ref=e1994]: "avx_log_type:"
+                                      - generic [ref=e1995]: microseg
+                                    - generic [ref=e1996]:
+                                      - generic [ref=e1997]: α
+                                      - generic [ref=e1998]: "avx_source:"
+                                      - generic [ref=e1999]: avx-l4-fw
+                                    - generic [ref=e2000]:
+                                      - generic [ref=e2001]: α
+                                      - generic [ref=e2002]: "avx_sourcetype:"
+                                      - generic [ref=e2003]: aviatrix:firewall:l4
+                                    - generic [ref=e2004]:
+                                      - generic [ref=e2005]: α
+                                      - generic [ref=e2006]: "cribl_breaker:"
+                                      - generic [ref=e2007]: Break on newlines
+                                    - generic [ref=e2008]:
+                                      - generic [ref=e2009]: α
+                                      - generic [ref=e2010]: "cribl_pipe:"
+                                      - generic [ref=e2011]: avx-parse
+                                    - generic [ref=e2012]:
+                                      - generic [ref=e2013]: α
+                                      - generic [ref=e2014]: "dst_ip:"
+                                      - generic [ref=e2015]: unknown
+                                    - generic [ref=e2016]:
+                                      - generic [ref=e2017]: α
+                                      - generic [ref=e2018]: "dst_mac:"
+                                      - generic [ref=e2019]: 11:22:33:44:55:66
+                                    - generic [ref=e2020]:
+                                      - generic [ref=e2021]: "#"
+                                      - generic [ref=e2022]: "dst_port:"
+                                      - generic [ref=e2023]: "8080"
+                                    - generic [ref=e2024]:
+                                      - generic [ref=e2025]: b
+                                      - generic [ref=e2026]: "enforced:"
+                                      - generic [ref=e2027]: "false"
+                                    - generic [ref=e2028]:
+                                      - generic [ref=e2029]: α
+                                      - generic [ref=e2030]: "gw_hostname:"
+                                      - generic [ref=e2031]: avx-gw-test
+                                    - generic [ref=e2032]:
+                                      - generic [ref=e2033]: α
+                                      - generic [ref=e2034]: "proto:"
+                                      - generic [ref=e2035]: TCP
+                                    - generic [ref=e2036]:
+                                      - generic [ref=e2037]: α
+                                      - generic [ref=e2038]: "src_ip:"
+                                      - generic [ref=e2039]: unknown
+                                    - generic [ref=e2040]:
+                                      - generic [ref=e2041]: α
+                                      - generic [ref=e2042]: "src_mac:"
+                                      - generic [ref=e2043]: aa:bb:cc:dd:ee:ff
+                                    - generic [ref=e2044]:
+                                      - generic [ref=e2045]: "#"
+                                      - generic [ref=e2046]: "src_port:"
+                                      - generic [ref=e2047]: "443"
+                                    - generic [ref=e2048]:
+                                      - generic [ref=e2049]: α
+                                      - generic [ref=e2050]: "syslog_pri:"
+                                      - generic [ref=e2051]: "14"
+                                    - generic [ref=e2052]:
+                                      - generic [ref=e2053]: α
+                                      - generic [ref=e2054]: "uuid:"
+                                      - generic [ref=e2055]: legacy-format
+                              - row [ref=e2056]:
+                                - gridcell "2 2026-02-24 19:17:39.000 -05:00" [ref=e2057]:
+                                  - generic [ref=e2058]:
+                                    - generic [ref=e2059]: "2"
+                                    - generic [ref=e2060]: 2026-02-24 19:17:39.000 -05:00
+                                - gridcell [ref=e2061]:
+                                  - generic [ref=e2064]:
+                                    - generic [ref=e2065]:
+                                      - generic [ref=e2066]: α
+                                      - generic [ref=e2067]: "_raw:"
+                                      - generic [ref=e2068]:
+                                        - text: "<158>Feb 25 00:17:39 GW-frontend-eks-spoke-18.216.17.241-sink /usr/local/bin/avx-gw-state-sync 2026/02/25 00:17:39 AviatrixGwMicrosegPacket: POLICY=51321a3b-e5e2-4ab3-9594-e97a51799e15 SRC_MAC=02:6..."
+                                        - generic [ref=e2069] [cursor=pointer]: Show more
+                                    - generic [ref=e2070]:
+                                      - generic [ref=e2071]: "#"
+                                      - generic [ref=e2072]: "_time:"
+                                      - generic [ref=e2073]: "1771978659"
+                                    - generic [ref=e2074]:
+                                      - generic [ref=e2075]: α
+                                      - generic [ref=e2076]: "action:"
+                                      - generic [ref=e2077]: PERMIT
+                                    - generic [ref=e2078]:
+                                      - generic [ref=e2079]: α
+                                      - generic [ref=e2080]: "avx_host:"
+                                      - generic [ref=e2081]: frontend-eks-spoke
+                                    - generic [ref=e2082]:
+                                      - generic [ref=e2083]: α
+                                      - generic [ref=e2084]: "avx_log_profile:"
+                                      - generic [ref=e2085]: security
+                                    - generic [ref=e2086]:
+                                      - generic [ref=e2087]: α
+                                      - generic [ref=e2088]: "avx_log_type:"
+                                      - generic [ref=e2089]: microseg
+                                    - generic [ref=e2090]:
+                                      - generic [ref=e2091]: α
+                                      - generic [ref=e2092]: "avx_source:"
+                                      - generic [ref=e2093]: avx-l4-fw
+                                    - generic [ref=e2094]:
+                                      - generic [ref=e2095]: α
+                                      - generic [ref=e2096]: "avx_sourcetype:"
+                                      - generic [ref=e2097]: aviatrix:firewall:l4
+                                    - generic [ref=e2098]:
+                                      - generic [ref=e2099]: α
+                                      - generic [ref=e2100]: "cribl_breaker:"
+                                      - generic [ref=e2101]: Break on newlines
+                                    - generic [ref=e2102]:
+                                      - generic [ref=e2103]: α
+                                      - generic [ref=e2104]: "cribl_pipe:"
+                                      - generic [ref=e2105]: avx-parse
+                                    - generic [ref=e2106]:
+                                      - generic [ref=e2107]: α
+                                      - generic [ref=e2108]: "data_hex:"
+                                      - generic [ref=e2109]: 0x
+                                    - generic [ref=e2110]:
+                                      - generic [ref=e2111]: α
+                                      - generic [ref=e2112]: "dst_ip:"
+                                      - generic [ref=e2113]: 10.5.0.8
+                                    - generic [ref=e2114]:
+                                      - generic [ref=e2115]: α
+                                      - generic [ref=e2116]: "dst_mac:"
+                                      - generic [ref=e2117]: 02:55:21:72:8c:63
+                                    - generic [ref=e2118]:
+                                      - generic [ref=e2119]: "#"
+                                      - generic [ref=e2120]: "dst_port:"
+                                      - generic [ref=e2121]: "80"
+                                    - generic [ref=e2122]:
+                                      - generic [ref=e2123]: b
+                                      - generic [ref=e2124]: "enforced:"
+                                      - generic [ref=e2125]: "true"
+                                    - generic [ref=e2126]:
+                                      - generic [ref=e2127]: α
+                                      - generic [ref=e2128]: "gw_hostname:"
+                                      - generic [ref=e2129]: frontend-eks-spoke
+                                    - generic [ref=e2130]:
+                                      - generic [ref=e2131]: α
+                                      - generic [ref=e2132]: "gw_ip:"
+                                      - generic [ref=e2133]: 18.216.17.241
+                                    - generic [ref=e2134]:
+                                      - generic [ref=e2135]: α
+                                      - generic [ref=e2136]: "ip_size:"
+                                      - generic [ref=e2137]: "60"
+                                    - generic [ref=e2138]:
+                                      - generic [ref=e2139]: α
+                                      - generic [ref=e2140]: "proto:"
+                                      - generic [ref=e2141]: TCP
+                                    - generic [ref=e2142]:
+                                      - generic [ref=e2143]: α
+                                      - generic [ref=e2144]: "session_byte_cnt:"
+                                      - generic [ref=e2145]: "0"
+                                    - generic [ref=e2146]:
+                                      - generic [ref=e2147]: α
+                                      - generic [ref=e2148]: "session_dur:"
+                                      - generic [ref=e2149]: "0"
+                                    - generic [ref=e2150]:
+                                      - generic [ref=e2151]: α
+                                      - generic [ref=e2152]: "session_end_reason:"
+                                      - generic [ref=e2153]: "0"
+                                    - generic [ref=e2154]:
+                                      - generic [ref=e2155]: α
+                                      - generic [ref=e2156]: "session_event:"
+                                      - generic [ref=e2157]: "0"
+                                    - generic [ref=e2158]:
+                                      - generic [ref=e2159]: α
+                                      - generic [ref=e2160]: "session_id:"
+                                      - generic [ref=e2161]: "15625921951502722107"
+                                    - generic [ref=e2162]:
+                                      - generic [ref=e2163]: α
+                                      - generic [ref=e2164]: "session_pkt_cnt:"
+                                      - generic [ref=e2165]: "0"
+                                    - generic [ref=e2166]:
+                                      - generic [ref=e2167]: α
+                                      - generic [ref=e2168]: "src_ip:"
+                                      - generic [ref=e2169]: 100.64.242.5
+                                    - generic [ref=e2170]:
+                                      - generic [ref=e2171]: α
+                                      - generic [ref=e2172]: "src_mac:"
+                                      - generic [ref=e2173]: 02:64:c0:e4:c9:b1
+                                    - generic [ref=e2174]:
+                                      - generic [ref=e2175]: "#"
+                                      - generic [ref=e2176]: "src_port:"
+                                      - generic [ref=e2177]: "37368"
+                                    - generic [ref=e2178]:
+                                      - generic [ref=e2179]: α
+                                      - generic [ref=e2180]: "syslog_pri:"
+                                      - generic [ref=e2181]: "158"
+                                    - generic [ref=e2182]:
+                                      - generic [ref=e2183]: α
+                                      - generic [ref=e2184]: "uuid:"
+                                      - generic [ref=e2185]: 51321a3b-e5e2-4ab3-9594-e97a51799e15
+                            - rowgroup
+                            - rowgroup [ref=e1959]
+                            - rowgroup
+                          - text:    
+            - img [ref=e1103]
+            - button "Toggle Data Preview" [ref=e1414] [cursor=pointer]:
+              - img "caret-right" [ref=e1106]:
+                - img [ref=e1107]
+      - button "Support" [ref=e290] [cursor=pointer]:
+        - img [ref=e291]
