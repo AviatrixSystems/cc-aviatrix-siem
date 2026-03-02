@@ -248,7 +248,7 @@ When routing to Splunk HEC, map these fields in your Cribl Destination:
 ## Screenshots
 
 ### Pipeline Stages
-All 5 processing stages with 31 functions:
+All 5 processing stages with 32 functions:
 
 ![Pipeline Stages](docs/screenshots/pipeline-stages.png)
 

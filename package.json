@@ -2,6 +2,7 @@
   "name": "cc-aviatrix-siem",
   "version": "0.1.0",
   "author": "Aviatrix",
+  "license": "MIT",
   "description": "Parse, normalize, and route Aviatrix Cloud Network syslog data for any SIEM destination. Supports 8 log types: L4 Microsegmentation, L7/TLS Inspection, Suricata IDS, FQDN Firewall, Controller API Audit, Gateway Network Stats, Gateway System Stats, and Tunnel Status.",
   "displayName": "Aviatrix Cloud Network Security",
   "logo": "logo.png",

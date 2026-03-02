@@ -2,6 +2,10 @@
 *.crbl
 dist/
 
+# Debug/temp files from API testing
+avx-parse.json
+avx-parse-wrapped.json
+
 # macOS
 .DS_Store
 
