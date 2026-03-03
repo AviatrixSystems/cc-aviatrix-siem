@@ -1,0 +1,21 @@
+id: default
+groups: {}
+routes:
+  - id: avxSyslog
+    name: "Aviatrix Syslog"
+    final: true
+    disabled: false
+    pipeline: avx-parse
+    description: "Route Aviatrix syslog messages to parsing pipeline"
+    clones: []
+    filter: "/Aviatrix|traffic_server\\[|suricata\\[/.test(_raw)"
+    output: default
+  - id: default
+    name: "Catch-All (Drop Unmatched)"
+    final: true
+    disabled: false
+    pipeline: devnull
+    description: "Drop events that don't match Aviatrix syslog patterns"
+    clones: []
+    filter: "true"
+    output: default

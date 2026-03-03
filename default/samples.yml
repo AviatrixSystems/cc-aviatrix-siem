@@ -1,0 +1,6 @@
+avxSamp:
+  sampleName: aviatrix-syslog.log
+  description: "Sample Aviatrix syslog events covering all 8 log types"
+  created: 1740441600000
+  size: 27397
+  numEvents: 47
