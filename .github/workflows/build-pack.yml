@@ -39,7 +39,7 @@ jobs:
           FILENAME="${PACK_ID}-${VERSION}.crbl"
           tar -czf "$FILENAME" \
             package.json README.md LICENSE logo.png logo.svg \
-            default/ data/ samples/ knowledge/
+            default/ data/ samples/
           echo "FILENAME=$FILENAME" >> "$GITHUB_OUTPUT"
           echo "Built $FILENAME ($(du -h "$FILENAME" | cut -f1))"
 
