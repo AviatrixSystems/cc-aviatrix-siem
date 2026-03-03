@@ -35,7 +35,7 @@ functions:
       comment: >
         Classification stage: detect Aviatrix log type from _raw content and set
         __avx_type internal field. All downstream functions filter on this field.
-        Log types: microseg, mitm, suricata, fqdn, cmd, gw_net_stats, gw_sys_stats, tunnel_status
+        Log types: microseg, mitm, suricata, fqdn, cmd, vpn_session, gw_net_stats, gw_sys_stats, tunnel_status
 
   - id: eval
     filter: "true"
@@ -53,6 +53,7 @@ functions:
             /AviatrixFQDNRule/.test(_raw) ? 'fqdn' :
             /AviatrixCMD/.test(_raw) ? 'cmd' :
             /AviatrixAPI/.test(_raw) ? 'cmd_v2' :
+            /AviatrixVPNSession:/.test(_raw) ? 'vpn_session' :
             /AviatrixGwNetStats:/.test(_raw) ? 'gw_net_stats' :
             /AviatrixGwSysStats:/.test(_raw) ? 'gw_sys_stats' :
             /AviatrixTunnelStatusChange/.test(_raw) ? 'tunnel_status' :
@@ -60,7 +61,7 @@ functions:
         - disabled: false
           name: __avx_profile
           value: >
-            ['microseg','mitm','suricata','fqdn','cmd','cmd_v2'].includes(__avx_type) ? 'security' :
+            ['microseg','mitm','suricata','fqdn','cmd','cmd_v2','vpn_session'].includes(__avx_type) ? 'security' :
             ['gw_net_stats','gw_sys_stats','tunnel_status'].includes(__avx_type) ? 'networking' :
             'unknown'
 
@@ -390,6 +391,19 @@ functions:
           value: "controller_ip ? `Controller-${controller_ip}` : 'Controller'"
 
   ###########################################################################
+  # STAGE 2f: VPN SESSION
+  ###########################################################################
+
+  - id: grok
+    filter: "__avx_type === 'vpn_session'"
+    disabled: false
+    groupId: parse_security
+    description: "Parse VPN Session (AviatrixVPNSession) connect/disconnect logs"
+    conf:
+      pattern: "%{SYSLOGTIMESTAMP:date}%{DATA}AviatrixVPNSession: User=%{DATA:vpn_user}, Status=%{WORD:vpn_status}, Gateway=%{DATA:vpn_gateway}, GatewayIP=%{IP:vpn_gateway_ip}, VPNVirtualIP=%{DATA:vpn_virtual_ip}, PublicIP=%{DATA:vpn_public_ip}, Login=%{DATA:vpn_login}, Logout=%{DATA:vpn_logout}, Duration=%{DATA:vpn_duration}, RXbytes=%{DATA:vpn_rx_bytes}, TXbytes=%{DATA:vpn_tx_bytes}, VPNClientPlatform=%{DATA:vpn_client_platform}, VPNClientVersion=%{GREEDYDATA:vpn_client_version}"
+      srcField: _raw
+
+  ###########################################################################
   # STAGE 3a: GATEWAY NETWORK STATS
   ###########################################################################
 
@@ -586,23 +600,6 @@ functions:
         - name: enforced
           value: "String(enforced) === 'true'"
 
-  # Enrich session fields with human-readable text (8.2+ events only)
-  # Uses PAN-OS naming conventions for session_event and session_end_reason
-  - id: eval
-    filter: "__avx_type === 'microseg' && session_event !== undefined"
-    disabled: false
-    groupId: normalize
-    description: "Map session_event and session_end_reason integers to text"
-    conf:
-      add:
-        - name: session_event_type
-          value: "Number(session_event) === 0 ? 'Start' : 'End'"
-        - name: session_end_reason_text
-          value: >
-            session_end_reason !== undefined ?
-            ({0:'active', 1:'tcp-fin', 2:'tcp-rst', 3:'timeout', 4:'tcp-rst-from-client', 5:'tcp-rst-from-server'})[Number(session_end_reason)] || 'unknown'
-            : undefined
-
   - id: eval
     filter: "__avx_type === 'gw_sys_stats'"
     disabled: false
@@ -660,6 +657,7 @@ functions:
             __avx_type === 'suricata' ? 'aviatrix:ids' :
             __avx_type === 'fqdn' ? 'aviatrix:firewall:fqdn' :
             (__avx_type === 'cmd' || __avx_type === 'cmd_v2') ? 'aviatrix:controller:audit' :
+            __avx_type === 'vpn_session' ? 'aviatrix:vpn:session' :
             __avx_type === 'gw_net_stats' ? 'aviatrix:gateway:network' :
             __avx_type === 'gw_sys_stats' ? 'aviatrix:gateway:system' :
             __avx_type === 'tunnel_status' ? 'aviatrix:tunnel:status' :
@@ -671,15 +669,17 @@ functions:
             __avx_type === 'suricata' ? 'avx-ids' :
             __avx_type === 'fqdn' ? 'avx-fqdn' :
             (__avx_type === 'cmd' || __avx_type === 'cmd_v2') ? 'avx-cmd' :
+            __avx_type === 'vpn_session' ? 'avx-vpn-session' :
             __avx_type === 'gw_net_stats' ? 'avx-gw-net-stats' :
             __avx_type === 'gw_sys_stats' ? 'avx-gw-sys-stats' :
             __avx_type === 'tunnel_status' ? 'avx-tunnel-status' :
             'avx-unknown'
         - name: avx_host
-          value: "gw_hostname || gateway || 'aviatrix'"
+          value: "gw_hostname || gateway || vpn_gateway || 'aviatrix'"
         - name: avx_log_type
           value: >
-            __avx_type === 'cmd_v2' ? 'cmd' : __avx_type
+            __avx_type === 'cmd_v2' ? 'cmd' :
+            __avx_type
         - name: avx_log_profile
           value: "__avx_profile"
 

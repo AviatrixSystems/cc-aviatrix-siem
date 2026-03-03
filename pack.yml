@@ -1,10 +1,10 @@
 id: cc-aviatrix-siem
-version: 0.1.0
+version: 0.2.0
 displayName: Aviatrix Cloud Network Security
 description: >
   Parse, normalize, and route Aviatrix Cloud Firewall syslog data for any SIEM destination.
-  Supports 8 log types: L4 Microsegmentation, L7/TLS Inspection, Suricata IDS, FQDN Firewall,
-  Controller API Audit, Gateway Network Stats, Gateway System Stats, and Tunnel Status.
+  Supports 9 log types: L4 Microsegmentation, L7/TLS Inspection, Suricata IDS, FQDN Firewall,
+  Controller API Audit, VPN Session, Gateway Network Stats, Gateway System Stats, and Tunnel Status.
 author: Aviatrix
 tags:
   - syslog
@@ -16,4 +16,5 @@ tags:
   - microsegmentation
   - ids
   - ips
+  - vpn
 minCriblVersion: "4.0"

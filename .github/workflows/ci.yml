@@ -23,6 +23,7 @@ jobs:
                    default/pipelines/avx-parse/conf.yml \
                    default/pipelines/devnull/conf.yml \
                    default/knowledge/grok/aviatrix.conf \
+                   default/samples/aviatrix-syslog.log \
                    samples/aviatrix-syslog.log; do
             if [ ! -f "$f" ]; then
               echo "::error::Missing required file: $f"
