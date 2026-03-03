@@ -33,9 +33,7 @@ CLAUDE.md
 # Prototype / exploration files
 previous-exploration/
 
-# Root-level duplicates (authoritative copies live in default/)
-/pack.yml
+# Root-level files that duplicate default/ (not needed in git)
 /routes.yml
 /pipelines/
 /knowledge/
-/samples/
