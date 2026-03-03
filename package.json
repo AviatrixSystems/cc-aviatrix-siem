@@ -1,14 +1,14 @@
 {
   "name": "cc-aviatrix-siem",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Aviatrix",
   "license": "MIT",
-  "description": "Parse, normalize, and route Aviatrix Cloud Network syslog data for any SIEM destination. Supports 8 log types: L4 Microsegmentation, L7/TLS Inspection, Suricata IDS, FQDN Firewall, Controller API Audit, Gateway Network Stats, Gateway System Stats, and Tunnel Status.",
+  "description": "Parse, normalize, and route Aviatrix Cloud Network syslog data for any SIEM destination. Supports 9 log types: L4 Microsegmentation, L7/TLS Inspection, Suricata IDS, FQDN Firewall, Controller API Audit, VPN Session, Gateway Network Stats, Gateway System Stats, and Tunnel Status.",
   "displayName": "Aviatrix Cloud Network Security",
   "logo": "logo.png",
   "minLogStreamVersion": "4.0",
   "tags": {
-    "streamtags": ["syslog", "firewall", "network", "security", "cloud", "aviatrix", "microsegmentation", "ids", "ips"],
+    "streamtags": ["syslog", "firewall", "network", "security", "cloud", "aviatrix", "microsegmentation", "ids", "ips", "vpn"],
     "dataType": ["logs"],
     "useCase": ["filtering", "enrichment"],
     "technology": ["aviatrix"]
