@@ -1,0 +1,164 @@
+name: Validate Pack
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_call:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required files exist
+        run: |
+          ERRORS=0
+          for f in package.json pack.yml LICENSE README.md logo.png logo.svg \
+                   default/pack.yml default/samples.yml \
+                   default/pipelines/route.yml \
+                   default/pipelines/avx-parse/conf.yml \
+                   default/pipelines/devnull/conf.yml \
+                   default/knowledge/grok/aviatrix.conf \
+                   samples/aviatrix-syslog.log; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Missing required file: $f"
+              ERRORS=$((ERRORS + 1))
+            else
+              echo "✓ $f"
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::$ERRORS required file(s) missing"
+            exit 1
+          fi
+
+      - name: Validate pack.yml
+        run: |
+          for field in id version displayName description author tags minCriblVersion; do
+            if ! grep -q "^${field}:" pack.yml; then
+              echo "::error::pack.yml missing required field: $field"
+              exit 1
+            fi
+          done
+          echo "✓ pack.yml has all required fields"
+
+      - name: Validate package.json
+        run: |
+          for field in name version author license description displayName logo minLogStreamVersion tags; do
+            if ! python3 -c "import json,sys; d=json.load(open('package.json')); assert '$field' in d, f'missing {field}'" 2>&1; then
+              echo "::error::package.json missing required field: $field"
+              exit 1
+            fi
+          done
+          echo "✓ package.json has all required fields"
+
+      - name: Validate version consistency
+        run: |
+          PACK_VER=$(grep '^version:' pack.yml | awk '{print $2}')
+          PKG_VER=$(python3 -c "import json; print(json.load(open('package.json'))['version'])")
+          if [ "$PACK_VER" != "$PKG_VER" ]; then
+            echo "::error::Version mismatch: pack.yml=$PACK_VER, package.json=$PKG_VER"
+            exit 1
+          fi
+          echo "✓ Versions match: $PACK_VER"
+
+      - name: Validate pipeline conf.yml is valid YAML
+        run: |
+          python3 -c "
+          import yaml, sys
+          try:
+              with open('default/pipelines/avx-parse/conf.yml') as f:
+                  data = yaml.safe_load(f)
+              funcs = data.get('functions', [])
+              print(f'✓ Pipeline has {len(funcs)} functions')
+              groups = set()
+              for fn in funcs:
+                  gid = fn.get('groupId', 'ungrouped')
+                  groups.add(gid)
+                  desc = fn.get('description', '')
+                  if not desc:
+                      print(f\"::warning::Function '{fn.get('id')}' in group '{gid}' has no description\")
+              print(f'✓ Pipeline groups: {sorted(groups)}')
+          except Exception as e:
+              print(f'::error::Pipeline YAML invalid: {e}')
+              sys.exit(1)
+          "
+
+      - name: Validate Grok patterns syntax
+        run: |
+          python3 -c "
+          import re, sys
+          errors = 0
+          with open('default/knowledge/grok/aviatrix.conf') as f:
+              for i, line in enumerate(f, 1):
+                  line = line.strip()
+                  if not line or line.startswith('#'):
+                      continue
+                  if ' ' not in line:
+                      print(f'::error::aviatrix.conf line {i}: no space separator')
+                      errors += 1
+                      continue
+                  name = line.split()[0]
+                  if not re.match(r'^[A-Z0-9_]+$', name):
+                      print(f'::warning::aviatrix.conf line {i}: pattern name \"{name}\" is not UPPER_SNAKE_CASE')
+          if errors:
+              sys.exit(1)
+          print('✓ Grok patterns syntax OK')
+          "
+
+      - name: Validate sample data
+        run: |
+          SAMPLE="samples/aviatrix-syslog.log"
+          LINES=$(wc -l < "$SAMPLE" | tr -d ' ')
+          echo "✓ Sample file has $LINES events"
+          if [ "$LINES" -lt 10 ]; then
+            echo "::error::Sample file has fewer than 10 events"
+            exit 1
+          fi
+
+      - name: Validate routes
+        run: |
+          python3 -c "
+          import yaml
+          with open('default/pipelines/route.yml') as f:
+              data = yaml.safe_load(f)
+          routes = data.get('routes', [])
+          has_catchall = any(r.get('filter') == 'true' and r.get('pipeline') == 'devnull' for r in routes)
+          if not has_catchall:
+              print('::error::Missing catch-all devnull route (Dispensary requirement)')
+              exit(1)
+          print(f'✓ Routes: {len(routes)} defined, catch-all present')
+          "
+
+      - name: Validate no sensitive data in samples
+        run: |
+          PATTERNS='password|secret|token|api[_-]?key|credentials|private[_-]?key|aws_access|aws_secret'
+          if grep -iE "$PATTERNS" samples/aviatrix-syslog.log; then
+            echo "::error::Sample data may contain sensitive information"
+            exit 1
+          fi
+          echo "✓ No sensitive patterns found in sample data"
+
+      - name: Test .crbl build
+        run: |
+          PACK_ID=$(grep '^id:' pack.yml | awk '{print $2}')
+          VERSION=$(grep '^version:' pack.yml | awk '{print $2}')
+          FILENAME="${PACK_ID}-${VERSION}.crbl"
+          tar -czf "$FILENAME" \
+            package.json README.md LICENSE logo.png logo.svg \
+            default/ data/ samples/ knowledge/
+          echo "✓ Built $FILENAME ($(du -h "$FILENAME" | cut -f1))"
+          # Verify it extracts cleanly
+          mkdir -p /tmp/crbl-test
+          tar -xzf "$FILENAME" -C /tmp/crbl-test
+          for f in package.json README.md LICENSE default/pipelines/avx-parse/conf.yml; do
+            if [ ! -f "/tmp/crbl-test/$f" ]; then
+              echo "::error::.crbl missing $f after extraction"
+              exit 1
+            fi
+          done
+          echo "✓ .crbl extracts cleanly with all required files"
