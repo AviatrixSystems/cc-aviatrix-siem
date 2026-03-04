@@ -22,6 +22,7 @@ This Pack replaces the standalone [Aviatrix SIEM Connector](https://github.com/A
 | Suricata IDS/IPS | `suricata` | security | Intrusion detection/prevention alerts (JSON) |
 | FQDN Firewall | `fqdn` | security | DNS-based firewall rule hits |
 | Controller API Audit | `cmd` | security | API calls, admin actions (V1 and V2.5 formats) |
+| VPN Session | `vpn_session` | security | VPN user connect/disconnect with session metrics |
 | Gateway Network Stats | `gw_net_stats` | networking | Interface throughput, packet rates, conntrack |
 | Gateway System Stats | `gw_sys_stats` | networking | CPU, memory, disk utilization with per-core detail |
 | Tunnel Status | `tunnel_status` | networking | Tunnel up/down state changes with cloud/region context |
@@ -32,7 +33,7 @@ Every event is tagged with `avx_log_profile` (`security` or `networking`) to sup
 
 | Profile | Log Types | Use Case |
 |---------|-----------|----------|
-| `security` | microseg, mitm, suricata, fqdn, cmd | SIEM / SOC |
+| `security` | microseg, mitm, suricata, fqdn, cmd, vpn_session | SIEM / SOC |
 | `networking` | gw_net_stats, gw_sys_stats, tunnel_status | NOC / Observability |
 
 Use these in Cribl Routes to fan out: security logs → Splunk/Sentinel, networking logs → Datadog/Dynatrace, or all → a single destination.
@@ -245,6 +246,24 @@ When routing to Splunk HEC, map these fields in your Cribl Destination:
 | `reason` | string | Failure reason (if applicable) |
 | `username` | string | User who initiated the action |
 
+### VPN Session
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `vpn_user` | string | VPN username |
+| `vpn_status` | string | Connection status (connected/disconnected) |
+| `vpn_gateway` | string | VPN gateway name |
+| `vpn_gateway_ip` | string | VPN gateway IP address |
+| `vpn_virtual_ip` | string | Assigned VPN virtual IP |
+| `vpn_public_ip` | string | Client public IP |
+| `vpn_login` | string | Login timestamp |
+| `vpn_logout` | string | Logout timestamp (disconnect events) |
+| `vpn_duration` | string | Session duration (disconnect events) |
+| `vpn_rx_bytes` | string | Bytes received (disconnect events) |
+| `vpn_tx_bytes` | string | Bytes transmitted (disconnect events) |
+| `vpn_client_platform` | string | Client OS platform |
+| `vpn_client_version` | string | VPN client version |
+
 ## Screenshots
 
 ### Pipeline Stages
@@ -264,12 +283,12 @@ Fully parsed L4 microsegmentation event with field extraction:
 
 ## Testing
 
-The Pack includes 47 sample events in `aviatrix-syslog.log` covering all 8 log types. Use Cribl's Preview feature:
+The Pack includes 49 sample events in `aviatrix-syslog.log` covering all 9 log types. Use Cribl's Preview feature:
 
 1. Open the `avx-parse` pipeline
 2. In the Preview pane, select the `aviatrix-syslog.log` sample
 3. Click **Run** to process all events
-4. Verify all 8 log types parse with correct `avx_sourcetype` values
+4. Verify all 9 log types parse with correct `avx_sourcetype` values
 
 ## Compatibility
 
@@ -303,6 +322,11 @@ For issues with this Pack, contact:
 For Aviatrix product issues, visit the [Aviatrix Support Portal](https://support.aviatrix.com).
 
 ## Release Notes
+
+### v0.2.0 (2026-03-03)
+- Add VPN Session log type (`AviatrixVPNSession`) with connect/disconnect parsing (13 `vpn_*` fields)
+- 49 sample events covering all 9 log types
+- Remove microseg session field enrichment (`session_event_type`, `session_end_reason_text`)
 
 ### v0.1.0 (2026-02-28)
 - Initial release
