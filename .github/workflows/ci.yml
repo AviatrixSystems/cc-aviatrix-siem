@@ -77,13 +77,21 @@ jobs:
               funcs = data.get('functions', [])
               print(f'✓ Pipeline has {len(funcs)} functions')
               groups = set()
+              errors = 0
               for fn in funcs:
                   gid = fn.get('groupId', 'ungrouped')
                   groups.add(gid)
+                  # Comment functions don't need descriptions
+                  if fn.get('id') == 'comment':
+                      continue
                   desc = fn.get('description', '')
                   if not desc:
-                      print(f\"::warning::Function '{fn.get('id')}' in group '{gid}' has no description\")
+                      print(f\"::error::Function '{fn.get('id')}' in group '{gid}' has no description (Dispensary requirement)\")
+                      errors += 1
               print(f'✓ Pipeline groups: {sorted(groups)}')
+              if errors:
+                  print(f'::error::{errors} function(s) missing descriptions')
+                  sys.exit(1)
           except Exception as e:
               print(f'::error::Pipeline YAML invalid: {e}')
               sys.exit(1)
@@ -111,6 +119,51 @@ jobs:
           print('✓ Grok patterns syntax OK')
           "
 
+      - name: Validate Grok pattern references
+        run: |
+          python3 << 'PYEOF'
+          import re, sys
+
+          # Cribl built-in Grok patterns (standard set shipped with Cribl Stream)
+          BUILTINS = {
+              'NOTSPACE', 'DATA', 'GREEDYDATA', 'INT', 'NUMBER', 'WORD',
+              'IP', 'IPV4', 'IPV6', 'HOSTNAME', 'IPORHOST',
+              'BASE10NUM', 'POSINT', 'NONNEGINT',
+              'SYSLOGTIMESTAMP', 'TIMESTAMP_ISO8601',
+              'MAC', 'UUID',
+              'MONTH', 'MONTHNUM', 'MONTHDAY', 'YEAR', 'TIME',
+              'SYSLOGHOST', 'SYSLOGPROG', 'SYSLOGFACILITY',
+              'QUOTEDSTRING', 'USERNAME', 'SPACE', 'PROG',
+          }
+
+          # Parse custom patterns from aviatrix.conf
+          custom = set()
+          with open('default/knowledge/grok/aviatrix.conf') as f:
+              for line in f:
+                  line = line.strip()
+                  if line and not line.startswith('#'):
+                      custom.add(line.split()[0])
+
+          known = BUILTINS | custom
+
+          # Find all %{PATTERN} references in pipeline
+          with open('default/pipelines/avx-parse/conf.yml') as f:
+              content = f.read()
+          refs = set(re.findall(r'%\{(\w+)[:\}]', content))
+
+          # Also check patterns referencing other patterns in aviatrix.conf
+          with open('default/knowledge/grok/aviatrix.conf') as f:
+              grok_content = f.read()
+          refs |= set(re.findall(r'%\{(\w+)[:\}]', grok_content))
+
+          missing = refs - known
+          if missing:
+              for p in sorted(missing):
+                  print(f'::error::Undefined Grok pattern referenced: {p}')
+              sys.exit(1)
+          print(f'✓ All {len(refs)} Grok pattern references resolved ({len(custom)} custom, {len(refs - custom)} built-in)')
+          PYEOF
+
       - name: Validate sample data
         run: |
           SAMPLE="samples/aviatrix-syslog.log"
@@ -120,6 +173,50 @@ jobs:
             echo "::error::Sample file has fewer than 10 events"
             exit 1
           fi
+
+      - name: Validate all log types present in samples
+        run: |
+          # Markers match the classification regexes in the pipeline conf.yml
+          # Using grep -F for fixed-string matching (portable, no regex escaping needed)
+          MISSING=0
+          check_marker() {
+            local type="$1" marker="$2"
+            if ! grep -qF "$marker" samples/aviatrix-syslog.log; then
+              echo "::error::Sample data missing log type '$type' (marker: $marker)"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✓ $type"
+            fi
+          }
+          # Required: all 9 primary log types must have sample data
+          check_marker microseg      "AviatrixGwMicrosegPacket"
+          check_marker mitm          "traffic_server["
+          check_marker suricata      "suricata["
+          check_marker fqdn          "AviatrixFQDNRule"
+          check_marker cmd           "AviatrixCMD:"
+          check_marker vpn_session   "AviatrixVPNSession:"
+          check_marker gw_net_stats  "AviatrixGwNetStats:"
+          check_marker gw_sys_stats  "AviatrixGwSysStats:"
+          check_marker tunnel_status "AviatrixTunnelStatusChange"
+          # Optional: cmd_v2 is a newer API audit format, warn if missing
+          if ! grep -qF "AviatrixAPI" samples/aviatrix-syslog.log; then
+            echo "::warning::Sample data missing cmd_v2 log type (AviatrixAPI)"
+          else
+            echo "✓ cmd_v2"
+          fi
+          if [ $MISSING -gt 0 ]; then
+            echo "::error::$MISSING log type(s) missing from sample data"
+            exit 1
+          fi
+
+      - name: Validate sample files are in sync
+        run: |
+          if ! diff -q default/samples/aviatrix-syslog.log samples/aviatrix-syslog.log > /dev/null 2>&1; then
+            echo "::error::default/samples/aviatrix-syslog.log and samples/aviatrix-syslog.log are out of sync"
+            diff default/samples/aviatrix-syslog.log samples/aviatrix-syslog.log || true
+            exit 1
+          fi
+          echo "✓ Sample files are in sync"
 
       - name: Validate routes
         run: |
