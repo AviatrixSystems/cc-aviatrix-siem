@@ -233,5 +233,15 @@
     "_raw": "Feb 25 00:22:45 ip-172-32-0-226 AviatrixFQDNRule2[CRIT]nfq_ssl_handle_client_hello() L#281  Gateway=prod-web-gw S_IP=10.50.1.100 D_IP=151.101.1.69 hostname=api.github.com state=MATCHED Rule=*.github.com;1",
     "_time": 1771978965.0,
     "cribl_breaker": "Break on newlines"
+  },
+  {
+    "_raw": "Feb 25 00:23:01 ip-172-31-46-24 cloudxd: AviatrixVPNSession: User=demo, Status=active, Gateway=vpn-gw-1, GatewayIP=52.52.76.149, VPNVirtualIP=192.168.0.6, PublicIP=203.0.113.45, Login=2026-02-25 00:22:58, Logout=N/A, Duration=N/A, RXbytes=N/A, TXbytes=N/A, VPNClientPlatform=Windows, VPNClientVersion=2.14.14",
+    "_time": 1771978981.0,
+    "cribl_breaker": "Break on newlines"
+  },
+  {
+    "_raw": "Feb 25 00:41:59 ip-172-31-46-24 cloudxd: AviatrixVPNSession: User=demo, Status=disconnected, Gateway=vpn-gw-1, GatewayIP=52.52.76.149, VPNVirtualIP=192.168.0.6, PublicIP=N/A, Login=2026-02-25 00:22:58, Logout=2026-02-25 00:41:57, Duration=0:0:18:59, RXbytes=2.1 MB, TXbytes=9.03 MB, VPNClientPlatform=Windows, VPNClientVersion=2.14.14",
+    "_time": 1771979519.0,
+    "cribl_breaker": "Break on newlines"
   }
 ]
