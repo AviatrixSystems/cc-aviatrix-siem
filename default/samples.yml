@@ -3,4 +3,4 @@ avxSamp:
   description: "Sample Aviatrix syslog events covering all 9 log types"
   created: 1740441600000
   size: 27886
-  numEvents: 49
+  numEvents: 51

@@ -180,67 +180,77 @@
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:21:40 18.190.163.185 Feb 25 00:21:40 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=USER_LOGIN_MANAGEMENT, argv=['--rtn_file', '/dev/null', 'user_login_management', 'action', 'get_password', 'get_password', '--user_name', 'copilot_service_account', '--password', '********', '--api_token', '', '--login_ip', ''], result=Success, reason=",
+    "_raw": "<14>Feb 25 00:21:40 18.190.163.185 Feb 25 00:21:40 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=USER_LOGIN_MANAGEMENT, argv=['--rtn_file', '/dev/null', 'user_login_management', 'action', 'get_password', 'get_password', '--user_name', 'copilot_service_account', '--password', '********', '--api_token', '', '--login_ip', ''], result=Success, reason=",
     "_time": 1771978900.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:21:38 18.190.163.185 Feb 25 00:21:38 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=DISABLE_RSYSLOG_FORWARDER, argv=['--rtn_file', '/dev/null', 'disable_rsyslog_forwarder', '--index', '1'], result=Success, reason=, username=admin",
+    "_raw": "<14>Feb 25 00:21:38 18.190.163.185 Feb 25 00:21:38 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=DISABLE_RSYSLOG_FORWARDER, argv=['--rtn_file', '/dev/null', 'disable_rsyslog_forwarder', '--index', '1'], result=Success, reason=, username=admin",
     "_time": 1771978898.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:21:55 18.190.163.185 Feb 25 00:21:55 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=ENABLE_RSYSLOG_FORWARDER, argv=['--rtn_file', '/dev/null', 'enable_rsyslog_forwarder', '3.149.191.227', '514', '--index', '1', '--name', 'Sample Data', '--protocol', 'UDP'], result=Success, reason=, username=admin",
+    "_raw": "<14>Feb 25 00:21:55 18.190.163.185 Feb 25 00:21:55 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=ENABLE_RSYSLOG_FORWARDER, argv=['--rtn_file', '/dev/null', 'enable_rsyslog_forwarder', '3.149.191.227', '514', '--index', '1', '--name', 'Sample Data', '--protocol', 'UDP'], result=Success, reason=, username=admin",
     "_time": 1771978915.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:21:57 18.190.163.185 Feb 25 00:21:57 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=ENABLE_RSYSLOG_FORWARDER, argv=['--rtn_file', '/dev/null', 'enable_rsyslog_forwarder', '3.149.191.227', '514', '--index', '1', '--name', 'Sample Data', '--protocol', 'UDP', '--exclude_list', 'backend-eks-spoke,frontend-eks-spoke,k8s-demo-db,k8s-transit'], result=Success, reason=, username=admin",
+    "_raw": "<14>Feb 25 00:21:57 18.190.163.185 Feb 25 00:21:57 Controller-10.0.0.120 run_cloudxd.py[3085]: AviatrixCMD: action=ENABLE_RSYSLOG_FORWARDER, argv=['--rtn_file', '/dev/null', 'enable_rsyslog_forwarder', '3.149.191.227', '514', '--index', '1', '--name', 'Sample Data', '--protocol', 'UDP', '--exclude_list', 'backend-eks-spoke,frontend-eks-spoke,k8s-demo-db,k8s-transit'], result=Success, reason=, username=admin",
     "_time": 1771978917.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "2026-02-25T00:21:58.939683+00:00 ip-172-32-0-226 cloudxd: AviatrixTunnelStatusChange: src_gw=oregon-transit(AWS us-west-2) dst_gw=100.20.53.124(NA NA) old_state=Down new_state=Up",
+    "_raw": "<14>2026-02-25T00:21:58.939683+00:00 ip-172-32-0-226 cloudxd: AviatrixTunnelStatusChange: src_gw=oregon-transit(AWS us-west-2) dst_gw=100.20.53.124(NA NA) old_state=Down new_state=Up",
     "_time": 1771978918.939683,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "2026-02-25T00:22:13.760273+00:00 ip-10-20-0-10 cloudxd: AviatrixTunnelStatusChange: src_gw=backend-eks-spoke(AWS us-east-2) dst_gw=frontend-eks-spoke(AWS us-east-2) old_state=Up new_state=Down",
+    "_raw": "<14>2026-02-25T00:22:13.760273+00:00 ip-10-20-0-10 cloudxd: AviatrixTunnelStatusChange: src_gw=backend-eks-spoke(AWS us-east-2) dst_gw=frontend-eks-spoke(AWS us-east-2) old_state=Up new_state=Down",
     "_time": 1771978933.760273,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "2026-02-25T00:22:16.330000+00:00 ip-10-2-0-14 cloudxd: AviatrixTunnelStatusChange: src_gw=k8s-transit(AWS us-east-2) dst_gw=k8s-demo-db(AWS us-east-2) old_state=Down new_state=Up",
+    "_raw": "<14>2026-02-25T00:22:16.330000+00:00 ip-10-2-0-14 cloudxd: AviatrixTunnelStatusChange: src_gw=k8s-transit(AWS us-east-2) dst_gw=k8s-demo-db(AWS us-east-2) old_state=Down new_state=Up",
     "_time": 1771978936.33,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "2026-02-25T00:22:29.150906+00:00 ip-10-2-0-14 cloudxd: AviatrixTunnelStatusChange: src_gw=k8s-transit(AWS us-east-2) dst_gw=west-transit(AWS us-west-2) old_state=Up new_state=Down",
+    "_raw": "<14>2026-02-25T00:22:29.150906+00:00 ip-10-2-0-14 cloudxd: AviatrixTunnelStatusChange: src_gw=k8s-transit(AWS us-east-2) dst_gw=west-transit(AWS us-west-2) old_state=Up new_state=Down",
     "_time": 1771978949.150906,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:22:40 ip-172-32-0-226 AviatrixFQDNRule2[CRIT]nfq_ssl_handle_client_hello() L#281  Gateway=spoke1-fqdn S_IP=172.32.1.144 D_IP=52.218.234.41 hostname=aviatrix-download.s3-us-west-2.amazonaws.com state=MATCHED Rule=*.amazonaws.com;1",
+    "_raw": "<14>Feb 25 00:22:40 ip-172-32-0-226 AviatrixFQDNRule2[CRIT]nfq_ssl_handle_client_hello() L#281  Gateway=spoke1-fqdn S_IP=172.32.1.144 D_IP=52.218.234.41 hostname=aviatrix-download.s3-us-west-2.amazonaws.com state=MATCHED Rule=*.amazonaws.com;1",
     "_time": 1771978960.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:22:42 ip-172-32-0-226 AviatrixFQDNRule1[CRIT]nfq_ssl_handle_client_hello() L#281  Gateway=spoke1-fqdn S_IP=172.32.1.144 D_IP=98.137.246.7 hostname=www.yahoo.com state=NO_MATCH drop_reason=NOT_WHITELISTED",
+    "_raw": "<14>Feb 25 00:22:42 ip-172-32-0-226 AviatrixFQDNRule1[CRIT]nfq_ssl_handle_client_hello() L#281  Gateway=spoke1-fqdn S_IP=172.32.1.144 D_IP=98.137.246.7 hostname=www.yahoo.com state=NO_MATCH drop_reason=NOT_WHITELISTED",
     "_time": 1771978962.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:22:45 ip-172-32-0-226 AviatrixFQDNRule2[CRIT]nfq_ssl_handle_client_hello() L#281  Gateway=prod-web-gw S_IP=10.50.1.100 D_IP=151.101.1.69 hostname=api.github.com state=MATCHED Rule=*.github.com;1",
+    "_raw": "<14>Feb 25 00:22:45 ip-172-32-0-226 AviatrixFQDNRule2[CRIT]nfq_ssl_handle_client_hello() L#281  Gateway=prod-web-gw S_IP=10.50.1.100 D_IP=151.101.1.69 hostname=api.github.com state=MATCHED Rule=*.github.com;1",
     "_time": 1771978965.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:23:01 ip-172-31-46-24 cloudxd: AviatrixVPNSession: User=demo, Status=active, Gateway=vpn-gw-1, GatewayIP=52.52.76.149, VPNVirtualIP=192.168.0.6, PublicIP=203.0.113.45, Login=2026-02-25 00:22:58, Logout=N/A, Duration=N/A, RXbytes=N/A, TXbytes=N/A, VPNClientPlatform=Windows, VPNClientVersion=2.14.14",
+    "_raw": "<14>Mar 10 12:37:41 3.131.22.171 Mar 10 12:37:41 Controller-10.0.0.141 run_cloudxd.py[1272]: AviatrixVPNSession: User=cmchenr, Status=active, Gateway=egress-vpn-gw, GatewayIP=, VPNVirtualIP=192.168.43.6, PublicIP=45.26.1.144, Login=2026-03-10 12:37:39, Logout=N/A, Duration=N/A, RXbytes=N/A, TXbytes=N/A, VPNClientPlatform=mac, VPNClientVersion=AVPNC-2.17.7",
     "_time": 1771978981.0,
     "cribl_breaker": "Break on newlines"
   },
   {
-    "_raw": "Feb 25 00:41:59 ip-172-31-46-24 cloudxd: AviatrixVPNSession: User=demo, Status=disconnected, Gateway=vpn-gw-1, GatewayIP=52.52.76.149, VPNVirtualIP=192.168.0.6, PublicIP=N/A, Login=2026-02-25 00:22:58, Logout=2026-02-25 00:41:57, Duration=0:0:18:59, RXbytes=2.1 MB, TXbytes=9.03 MB, VPNClientPlatform=Windows, VPNClientVersion=2.14.14",
+    "_raw": "<14>Mar 10 12:38:18 3.131.22.171 Mar 10 12:38:17 Controller-10.0.0.141 run_cloudxd.py[1272]: AviatrixVPNSession: User=cmchenr, Status=disconnected, Gateway=egress-vpn-gw, GatewayIP=, VPNVirtualIP=192.168.43.6, PublicIP=45.26.1.144, Login=2026-03-10 12:37:39, Logout=2026-03-10 12:38:16, Duration=0:0:0:37, RXbytes=8.7KB, TXbytes=13.4KB, VPNClientPlatform=mac, VPNClientVersion=AVPNC-2.17.7",
+    "_time": 1771979519.0,
+    "cribl_breaker": "Break on newlines"
+  },
+  {
+    "_raw": "<14>Mar 10 12:37:41 3.131.22.171 Mar 10 12:37:41 Controller-10.0.0.141 run_cloudxd.py[1272]: AviatrixVPNSession: User=jdoe, Status=active, Gateway=vpn-gw-1, GatewayIP=52.52.76.149, VPNVirtualIP=192.168.0.6, PublicIP=203.0.113.45, Login=2026-03-10 12:37:39, Logout=N/A, Duration=N/A, RXbytes=N/A, TXbytes=N/A, VPNClientPlatform=Windows, VPNClientVersion=2.14.14",
+    "_time": 1771979519.0,
+    "cribl_breaker": "Break on newlines"
+  },
+  {
+    "_raw": "<14>Mar 10 12:38:18 3.131.22.171 Mar 10 12:38:17 Controller-10.0.0.141 run_cloudxd.py[1272]: AviatrixVPNSession: User=jdoe, Status=disconnected, Gateway=vpn-gw-1, GatewayIP=52.52.76.149, VPNVirtualIP=192.168.0.6, PublicIP=203.0.113.45, Login=2026-03-10 12:37:39, Logout=2026-03-10 12:38:16, Duration=0:0:18:59, RXbytes=2.1 MB, TXbytes=9.03 MB, VPNClientPlatform=Windows, VPNClientVersion=2.14.14",
     "_time": 1771979519.0,
     "cribl_breaker": "Break on newlines"
   }

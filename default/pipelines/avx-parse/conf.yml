@@ -31,6 +31,7 @@ functions:
     filter: "true"
     disabled: false
     groupId: classify
+    description: "Classification stage: detect Aviatrix log type from _raw content"
     conf:
       comment: >
         Classification stage: detect Aviatrix log type from _raw content and set
@@ -327,7 +328,7 @@ functions:
     groupId: parse_security
     description: "Parse FQDN Firewall Rule logs"
     conf:
-      pattern: "%{SYSLOGTIMESTAMP:date}.*AviatrixFQDNRule.*Gateway=%{HOSTNAME:gateway}.*S_IP=%{IP:src_ip}.*D_IP=%{IP:dst_ip}.*hostname=%{HOSTNAME:fqdn_hostname}.*state=%{WORD:state}.*"
+      pattern: "(?:<%{NUMBER:syslog_pri}>)?%{SYSLOGTIMESTAMP:date}.*AviatrixFQDNRule.*Gateway=%{HOSTNAME:gateway}.*S_IP=%{IP:src_ip}.*D_IP=%{IP:dst_ip}.*hostname=%{HOSTNAME:fqdn_hostname}.*state=%{WORD:state}.*"
       srcField: _raw
 
   # Try to extract optional drop_reason and Rule fields
@@ -356,7 +357,7 @@ functions:
     groupId: parse_security
     description: "Parse Controller CMD (V1 API) logs"
     conf:
-      pattern: "%{SYSLOGTIMESTAMP:date}.*Controller-%{IP:controller_ip}.*AviatrixCMD: action=%{WORD:action}, argv=%{DATA:args}, result=%{WORD:result}, reason=%{DATA:reason}, username=%{NOTSPACE:username}"
+      pattern: "(?:<%{NUMBER:syslog_pri}>)?%{SYSLOGTIMESTAMP:date}.*Controller-%{IP:controller_ip}.*AviatrixCMD: action=%{WORD:action}, argv=%{DATA:args}, result=%{WORD:result}, reason=%{DATA:reason}, username=%{NOTSPACE:username}"
       srcField: _raw
 
   # V1 fallback without username
@@ -366,7 +367,7 @@ functions:
     groupId: parse_security
     description: "Parse Controller CMD (V1 API) without username"
     conf:
-      pattern: "%{SYSLOGTIMESTAMP:date}.*Controller-%{IP:controller_ip}.*AviatrixCMD: action=%{WORD:action}, argv=%{DATA:args}, result=%{WORD:result}, reason=%{DATA:reason}$"
+      pattern: "(?:<%{NUMBER:syslog_pri}>)?%{SYSLOGTIMESTAMP:date}.*Controller-%{IP:controller_ip}.*AviatrixCMD: action=%{WORD:action}, argv=%{DATA:args}, result=%{WORD:result}, reason=%{DATA:reason}$"
       srcField: _raw
 
   # V2.5 API format (AviatrixAPI)
@@ -376,7 +377,7 @@ functions:
     groupId: parse_security
     description: "Parse Controller API (V2.5) logs"
     conf:
-      pattern: "%{SYSLOGTIMESTAMP:date}.*AviatrixAPI.*url=%{GREEDYDATA:action} user=%{GREEDYDATA:username}? req_data=%{GREEDYDATA:args} resp_status=%{GREEDYDATA:result} resp_data=%{GREEDYDATA:reason}"
+      pattern: "(?:<%{NUMBER:syslog_pri}>)?%{SYSLOGTIMESTAMP:date}.*AviatrixAPI.*url=%{GREEDYDATA:action} user=%{GREEDYDATA:username}? req_data=%{GREEDYDATA:args} resp_status=%{GREEDYDATA:result} resp_data=%{GREEDYDATA:reason}"
       srcField: _raw
 
   # Set gw_hostname for CMD logs
@@ -400,7 +401,7 @@ functions:
     groupId: parse_security
     description: "Parse VPN Session (AviatrixVPNSession) connect/disconnect logs"
     conf:
-      pattern: "%{SYSLOGTIMESTAMP:date}%{DATA}AviatrixVPNSession: User=%{DATA:vpn_user}, Status=%{WORD:vpn_status}, Gateway=%{DATA:vpn_gateway}, GatewayIP=%{IP:vpn_gateway_ip}, VPNVirtualIP=%{DATA:vpn_virtual_ip}, PublicIP=%{DATA:vpn_public_ip}, Login=%{DATA:vpn_login}, Logout=%{DATA:vpn_logout}, Duration=%{DATA:vpn_duration}, RXbytes=%{DATA:vpn_rx_bytes}, TXbytes=%{DATA:vpn_tx_bytes}, VPNClientPlatform=%{DATA:vpn_client_platform}, VPNClientVersion=%{GREEDYDATA:vpn_client_version}"
+      pattern: "(?:<%{NUMBER:syslog_pri}>)?%{SYSLOGTIMESTAMP:date}%{DATA}AviatrixVPNSession: User=%{DATA:vpn_user}, Status=%{WORD:vpn_status}, Gateway=%{DATA:vpn_gateway}, GatewayIP=%{DATA:vpn_gateway_ip}, VPNVirtualIP=%{DATA:vpn_virtual_ip}, PublicIP=%{DATA:vpn_public_ip}, Login=%{DATA:vpn_login}, Logout=%{DATA:vpn_logout}, Duration=%{DATA:vpn_duration}, RXbytes=%{DATA:vpn_rx_bytes}, TXbytes=%{DATA:vpn_tx_bytes}, VPNClientPlatform=%{DATA:vpn_client_platform}, VPNClientVersion=%{GREEDYDATA:vpn_client_version}"
       srcField: _raw
 
   ###########################################################################
@@ -526,7 +527,7 @@ functions:
     groupId: parse_networking
     description: "Parse Tunnel Status Change logs"
     conf:
-      pattern: "^%{TIMESTAMP_ISO8601:date}.*AviatrixTunnelStatusChange.*src_gw=(?<src_gw>[^(\\s]+\\([^)]+\\)).*dst_gw=(?<dst_gw>[^(\\s]+\\([^)]+\\)).*old_state=%{WORD:old_state}.*new_state=%{WORD:new_state}"
+      pattern: "^(?:<%{NUMBER:syslog_pri}>)?%{TIMESTAMP_ISO8601:date}.*AviatrixTunnelStatusChange.*src_gw=(?<src_gw>[^(\\s]+\\([^)]+\\)).*dst_gw=(?<dst_gw>[^(\\s]+\\([^)]+\\)).*old_state=%{WORD:old_state}.*new_state=%{WORD:new_state}"
       srcField: _raw
 
   # Better tunnel gateway extraction with region info
