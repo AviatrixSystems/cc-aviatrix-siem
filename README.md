@@ -49,14 +49,6 @@ To ensure proper data routing, you must make a choice: retain the current settin
 
 Once everything is configured, perform a Commit & Deploy to enable data collection.
 
-## Splunk Integration
-
-When routing to a Splunk HEC destination, map the following output fields:
-
-- `avx_sourcetype` → Splunk `sourcetype` (e.g., `aviatrix:firewall:l4`)
-- `avx_source` → Splunk `source` (e.g., `avx-l4-fw`)
-- `avx_host` → Splunk `host`
-
 ## Testing
 
 The Pack includes 51 sample events covering all 9 log types. Use Cribl's Preview feature to verify parsing:
@@ -93,10 +85,6 @@ Upgrading certain Cribl Packs using the same Pack ID can have unintended consequ
 - Initial release
 - 8 log types with single pipeline and 5 processing stages
 - Splunk-compatible sourcetype mapping
-
-## Contributing
-
-To contribute to the Pack, please connect with us on [Cribl Community Slack](https://cribl.io/community). You can suggest new features or offer to collaborate.
 
 ## Support
 
