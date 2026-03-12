@@ -17,7 +17,7 @@ jobs:
       - name: Validate required files exist
         run: |
           ERRORS=0
-          for f in package.json pack.yml LICENSE README.md logo.png logo.svg \
+          for f in package.json pack.yml LICENSE README.md \
                    default/pack.yml default/samples.yml \
                    default/pipelines/route.yml \
                    default/pipelines/avx-parse/conf.yml \
@@ -49,7 +49,7 @@ jobs:
 
       - name: Validate package.json
         run: |
-          for field in name version author license description displayName logo minLogStreamVersion tags; do
+          for field in name version author license description displayName minLogStreamVersion tags; do
             if ! python3 -c "import json,sys; d=json.load(open('package.json')); assert '$field' in d, f'missing {field}'" 2>&1; then
               echo "::error::package.json missing required field: $field"
               exit 1
@@ -265,7 +265,7 @@ jobs:
           VERSION=$(grep '^version:' pack.yml | awk '{print $2}')
           FILENAME="${PACK_ID}-${VERSION}.crbl"
           tar -czf "$FILENAME" \
-            package.json README.md LICENSE logo.png logo.svg \
+            package.json README.md LICENSE \
             default/ data/ samples/
           echo "✓ Built $FILENAME ($(du -h "$FILENAME" | cut -f1))"
           # Verify it extracts cleanly
