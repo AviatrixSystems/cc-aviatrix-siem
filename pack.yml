@@ -1,5 +1,5 @@
 id: cc-aviatrix-siem
-version: 0.2.2
+version: 0.2.3
 displayName: Aviatrix Cloud Network Security
 description: >
   Parse, normalize, and route Aviatrix Cloud Firewall syslog data for any SIEM destination.
